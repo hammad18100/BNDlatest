@@ -96,30 +96,18 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 })();
 
-// Parallax fade-in for second background on scroll
-window.addEventListener('scroll', function() {
-  var secondBg = document.getElementById('secondBg');
-  var trigger = 10; // Lowered for testing
-  console.log('ScrollY:', window.scrollY);
-  if (window.scrollY > trigger) {
-    secondBg.classList.add('show');
-    console.log('Second background shown');
-  } else {
-    secondBg.classList.remove('show');
-    console.log('Second background hidden');
-  }
-});
-
 // Show SecondBackground.jpg when scrolling past the hero section
 window.addEventListener('scroll', function() {
   var secondBg = document.getElementById('secondBg');
   var hero = document.querySelector('.hero');
-  var heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
-  console.log('ScrollY:', window.scrollY, 'Hero bottom:', heroBottom);
-  if (window.scrollY > heroBottom - 50) {
-    secondBg.classList.add('show');
-  } else {
-    secondBg.classList.remove('show');
+  if (hero && secondBg) {
+    var heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
+    console.log('ScrollY:', window.scrollY, 'Hero bottom:', heroBottom);
+    if (window.scrollY > heroBottom - 50) {
+      secondBg.classList.add('show');
+    } else {
+      secondBg.classList.remove('show');
+    }
   }
 });
 </script>

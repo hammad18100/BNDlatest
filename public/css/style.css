@@ -1657,16 +1657,16 @@ body.products-page, .products-page main {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
-  background: url('/images/SecondBackground.jpg') center center / cover no-repeat fixed;
-  background-size: 100% 100% !important;
+  background: url('/images/SecondBackground.jpg') center center / cover no-repeat;
+  background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-attachment: scroll !important;
   opacity: 0;
   transform: none !important;
-  z-index: 99999;
+  z-index: 1;
   border: none;
   margin: 0;
   box-shadow: none;
@@ -1686,12 +1686,12 @@ body.products-page, .products-page main {
 }
 
 .second-background-section {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   min-height: 100vh;
   max-height: 100vh;
   background: url('/images/SecondBackground.jpg') center center / cover no-repeat;
-  background-size: 100% 100% !important;
+  background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
   background-attachment: scroll !important;
@@ -1721,7 +1721,7 @@ html {
   #secondBg.second-background {
     background-attachment: scroll !important;
     background: url('/images/SecondBackground.jpg') center center / cover no-repeat scroll !important;
-    background-size: 100% 100% !important;
+    background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     transform: none !important;
@@ -1732,7 +1732,7 @@ html {
   .second-background-section {
     background-attachment: scroll !important;
     background: url('/images/SecondBackground.jpg') center center / cover no-repeat scroll !important;
-    background-size: 100% 100% !important;
+    background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
     transform: none !important;
