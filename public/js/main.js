@@ -25,6 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (desktopNav) {
                 desktopNav.style.display = 'none';
             }
+            
+            // Hide all navigation links on mobile
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.style.display = 'none';
+                link.style.visibility = 'hidden';
+            });
+            
+            // Hide collections dropdown on mobile
+            const collectionsContainer = document.querySelector('.collections-menu-container');
+            if (collectionsContainer) {
+                collectionsContainer.style.display = 'none';
+                collectionsContainer.style.visibility = 'hidden';
+            }
         } else {
             mobileNavToggle.style.display = 'none';
             mobileNav.classList.remove('active');
@@ -43,12 +57,77 @@ document.addEventListener('DOMContentLoaded', () => {
             if (desktopNav) {
                 desktopNav.style.display = 'flex';
             }
+            
+            // Show all navigation links on desktop
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.style.display = 'inline-block';
+                link.style.visibility = 'visible';
+            });
+            
+            // Show collections dropdown on desktop
+            const collectionsContainer = document.querySelector('.collections-menu-container');
+            if (collectionsContainer) {
+                collectionsContainer.style.display = 'block';
+                collectionsContainer.style.visibility = 'visible';
+            }
         }
     }
     
     // Check on load and resize
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    
+    // Force hide navigation on mobile on page load
+    function forceHideNavigation() {
+        if (window.innerWidth <= 768) {
+            // Hide all possible navigation elements
+            const elementsToHide = [
+                '.desktop-nav',
+                '.nav-link',
+                '.collections-menu-container',
+                '.collections-dropdown',
+                'a[href="/"]',
+                'a[href="/products"]',
+                'a[href="/about"]',
+                'a[href="#"]'
+            ];
+            
+            elementsToHide.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    el.style.display = 'none';
+                    el.style.visibility = 'hidden';
+                    el.style.opacity = '0';
+                    el.style.position = 'absolute';
+                    el.style.left = '-9999px';
+                });
+            });
+        }
+    }
+    
+    // Run on page load
+    forceHideNavigation();
+    
+    // Also run after a short delay to ensure DOM is fully loaded
+    setTimeout(forceHideNavigation, 100);
+    
+    // Force hide mobile nav on page load
+    function forceHideMobileNav() {
+        const mobileNav = document.getElementById('mobileNav');
+        if (mobileNav) {
+            mobileNav.classList.remove('active');
+            mobileNav.style.display = 'none';
+            mobileNav.style.visibility = 'hidden';
+            mobileNav.style.opacity = '0';
+            mobileNav.style.pointerEvents = 'none';
+        }
+    }
+    
+    // Run mobile nav hiding on page load
+    forceHideMobileNav();
+    setTimeout(forceHideMobileNav, 100);
+    setTimeout(forceHideMobileNav, 500);
     
     // Close mobile nav when clicking outside
     document.addEventListener('click', (e) => {
@@ -72,25 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    if (mobileNavClose) {
-        mobileNavClose.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            mobileNavToggle.setAttribute('aria-expanded', 'false');
-            // Re-enable body scroll
-            document.body.style.overflow = '';
-        });
-    }
+    // Close button removed - mobile nav is now completely empty
     
-    // Close mobile nav when clicking on a link
-    const mobileNavLinks = mobileNav.querySelectorAll('a');
-    mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileNav.classList.remove('active');
-            mobileNavToggle.setAttribute('aria-expanded', 'false');
-            // Re-enable body scroll
-            document.body.style.overflow = '';
-        });
-    });
+    // Mobile nav is now empty - no links to close
     
     // Collections dropdown functionality
     const collectionsContainer = document.querySelector('.collections-menu-container');

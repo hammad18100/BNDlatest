@@ -1682,6 +1682,27 @@ body.products-page, .products-page main {
   /* Hide desktop navigation on mobile */
   .desktop-nav {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  
+  /* Hide all navigation links on mobile */
+  .nav-link {
+    display: none !important;
+  }
+  
+  /* Hide collections dropdown on mobile */
+  .collections-menu-container {
+    display: none !important;
+  }
+  
+  .collections-dropdown {
+    display: none !important;
   }
   
   /* Hide header actions on mobile by default */
@@ -1704,6 +1725,7 @@ body.products-page, .products-page main {
     justify-content: center;
     position: relative;
     padding: 10px 20px;
+    min-height: 60px;
   }
   
   .logo-container {
@@ -1711,6 +1733,7 @@ body.products-page, .products-page main {
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
+    pointer-events: auto;
   }
   
   .logo-container img {
@@ -1736,6 +1759,51 @@ body.products-page, .products-page main {
     color: #aaa;
   }
   
+  /* Ensure no navigation elements show on mobile */
+  .main-header nav {
+    display: none !important;
+  }
+  
+  .main-header .nav-link,
+  .main-header .collections-menu-container,
+  .main-header .collections-dropdown {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Nuclear option - hide ALL navigation elements */
+  .main-header a[href="/"],
+  .main-header a[href="/products"],
+  .main-header a[href="/about"],
+  .main-header a[href="#"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+  
+  /* Hide any text that contains navigation words */
+  .main-header:contains("HOME"),
+  .main-header:contains("COLLECTIONS"),
+  .main-header:contains("ABOUT US") {
+    display: none !important;
+  }
+  
+  /* Hide ALL navigation elements on mobile - nuclear option */
+  .main-header *:not(.logo-container):not(.mobile-nav-toggle):not(.mobile-nav) {
+    display: none !important;
+  }
+  
+  /* Ensure only logo and hamburger are visible */
+  .main-header {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    position: relative !important;
+  }
+  
   .mobile-nav {
     position: fixed;
     top: 0;
@@ -1744,13 +1812,32 @@ body.products-page, .products-page main {
     height: 100vh;
     background: rgba(0,0,0,0.95);
     z-index: 1000;
-    display: none;
+    display: none !important;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .mobile-nav.active {
+    display: flex !important;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  
+  /* Force hide mobile nav by default - nuclear option */
+  .mobile-nav:not(.active) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    left: -9999px !important;
+    top: -9999px !important;
   }
   
   .mobile-nav.active {
