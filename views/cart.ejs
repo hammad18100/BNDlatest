@@ -58,6 +58,13 @@
     <div id="cartSuccessMessage" class="cart-success-message" style="display: none;">
       <span>Item added to cart successfully!</span>
     </div>
+    
+    <!-- Debug info (remove in production) -->
+    <div id="debugInfo" style="background: #333; color: #fff; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
+      <div>Cart Items: <span id="debugItemCount">0</span></div>
+      <div>Cart Total: <span id="debugCartTotal">RM 0.00</span></div>
+      <button onclick="testCartButtons()" style="background: #666; color: #fff; border: none; padding: 5px 10px; border-radius: 3px; margin-top: 5px;">Test Buttons</button>
+    </div>
 
     <div class="cart-page-content">
       <div class="cart-items-container" id="cartItemsContainer">
@@ -89,10 +96,12 @@
       }
       
       // Ensure cart is properly loaded from localStorage
-      window.cart.items = JSON.parse(localStorage.getItem('cart')) || [];
+      const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
+      window.cart.items = savedCart;
       console.log('Cart items loaded:', window.cart.items);
       window.cart.updateCartCount();
       
+      // Render the cart page
       renderMobileCartPage();
       
       // Show success message if redirected from product page
@@ -100,6 +109,15 @@
       if (urlParams.get('added') === 'true') {
         showCartSuccessMessage();
       }
+      
+      // Test cart functionality
+      console.log('Cart instance available:', !!window.cart);
+      console.log('Cart items count:', window.cart.items.length);
+      console.log('Cart methods available:', {
+        updateQuantity: typeof window.cart.updateQuantity,
+        saveCart: typeof window.cart.saveCart,
+        updateCartCount: typeof window.cart.updateCartCount
+      });
     });
 
     function showCartSuccessMessage() {
@@ -155,6 +173,18 @@
 
       if (cartPageTotal) cartPageTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
       if (cartPageCheckoutBtn) cartPageCheckoutBtn.disabled = false;
+      
+      // Update debug info
+      const debugItemCount = document.getElementById('debugItemCount');
+      const debugCartTotal = document.getElementById('debugCartTotal');
+      
+      if (debugItemCount) {
+        debugItemCount.textContent = window.cart.items.length;
+      }
+      
+      if (debugCartTotal) {
+        debugCartTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
+      }
     }
 
     function updateCartItemQuantity(index, newQuantity) {
@@ -202,62 +232,114 @@
     function addMobileCartEventListeners() {
       console.log('Adding mobile cart event listeners');
       
+      // Remove existing event listeners to prevent duplicates
+      const existingButtons = document.querySelectorAll('.quantity-btn, .remove-item');
+      existingButtons.forEach(button => {
+        button.replaceWith(button.cloneNode(true));
+      });
+      
       // Add event listeners for minus buttons
       const minusButtons = document.querySelectorAll('.minus-btn');
+      console.log('Found minus buttons:', minusButtons.length);
       minusButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          const index = parseInt(button.dataset.index);
+          const index = parseInt(this.dataset.index);
           console.log('Minus button clicked for index:', index);
           
-          if (window.cart && window.cart.items[index]) {
+          if (window.cart && window.cart.items && window.cart.items[index]) {
             const currentQuantity = window.cart.items[index].quantity;
             const newQuantity = Math.max(1, currentQuantity - 1);
             console.log('Updating quantity from', currentQuantity, 'to', newQuantity);
-            window.cart.updateQuantity(index, newQuantity);
-            renderMobileCartPage();
+            
+            // Directly update the cart item
+            window.cart.items[index].quantity = newQuantity;
+            window.cart.saveCart();
             window.cart.updateCartCount();
+            renderMobileCartPage();
+          } else {
+            console.error('Cart or item not available for index:', index);
           }
         });
       });
 
       // Add event listeners for plus buttons
       const plusButtons = document.querySelectorAll('.plus-btn');
+      console.log('Found plus buttons:', plusButtons.length);
       plusButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          const index = parseInt(button.dataset.index);
+          const index = parseInt(this.dataset.index);
           console.log('Plus button clicked for index:', index);
           
-          if (window.cart && window.cart.items[index]) {
+          if (window.cart && window.cart.items && window.cart.items[index]) {
             const currentQuantity = window.cart.items[index].quantity;
             const newQuantity = currentQuantity + 1;
             console.log('Updating quantity from', currentQuantity, 'to', newQuantity);
-            window.cart.updateQuantity(index, newQuantity);
-            renderMobileCartPage();
+            
+            // Directly update the cart item
+            window.cart.items[index].quantity = newQuantity;
+            window.cart.saveCart();
             window.cart.updateCartCount();
+            renderMobileCartPage();
+          } else {
+            console.error('Cart or item not available for index:', index);
           }
         });
       });
 
       // Add event listeners for remove buttons
       const removeButtons = document.querySelectorAll('.remove-item');
+      console.log('Found remove buttons:', removeButtons.length);
       removeButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
-          const index = parseInt(button.dataset.index);
+          const index = parseInt(this.dataset.index);
           console.log('Remove button clicked for index:', index);
           
-          if (window.cart) {
+          if (window.cart && window.cart.items) {
             window.cart.removeItem(index);
             renderMobileCartPage();
             window.cart.updateCartCount();
+          } else {
+            console.error('Cart not available for removal');
           }
         });
       });
+    }
+
+    function testCartButtons() {
+      console.log('Testing cart buttons...');
+      console.log('Cart instance:', window.cart);
+      console.log('Cart items:', window.cart?.items);
+      
+      // Update debug info
+      const debugItemCount = document.getElementById('debugItemCount');
+      const debugCartTotal = document.getElementById('debugCartTotal');
+      
+      if (debugItemCount && window.cart) {
+        debugItemCount.textContent = window.cart.items.length;
+      }
+      
+      if (debugCartTotal && window.cart) {
+        debugCartTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
+      }
+      
+      // Test if buttons exist
+      const minusButtons = document.querySelectorAll('.minus-btn');
+      const plusButtons = document.querySelectorAll('.plus-btn');
+      const removeButtons = document.querySelectorAll('.remove-item');
+      
+      console.log('Found buttons:', {
+        minus: minusButtons.length,
+        plus: plusButtons.length,
+        remove: removeButtons.length
+      });
+      
+      alert(`Found ${minusButtons.length} minus buttons, ${plusButtons.length} plus buttons, ${removeButtons.length} remove buttons`);
     }
   </script>
 </body>
