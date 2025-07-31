@@ -1813,6 +1813,7 @@ body.products-page, .products-page main {
     right: 20px !important;
     z-index: 1001 !important;
     display: block !important;
+    pointer-events: auto !important;
   }
 
   .mobile-cart-icon {
@@ -1827,6 +1828,8 @@ body.products-page, .products-page main {
     cursor: pointer;
     position: relative;
     transition: color 0.3s;
+    pointer-events: auto !important;
+    z-index: 1002 !important;
   }
 
   .mobile-cart-icon:hover {
@@ -1853,6 +1856,7 @@ body.products-page, .products-page main {
     font-size: 0.7rem;
     font-weight: bold;
     min-width: 18px;
+    pointer-events: none !important;
   }
   
   /* Ensure only logo and hamburger are visible */

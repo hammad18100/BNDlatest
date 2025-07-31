@@ -252,7 +252,18 @@ class Cart {
     }
 
     if (mobileCartIcon) {
-      mobileCartIcon.addEventListener('click', () => {
+      console.log('Mobile cart icon found, adding click listener');
+      mobileCartIcon.addEventListener('click', (e) => {
+        console.log('Mobile cart clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleCart();
+      });
+      
+      // Add touch event for better mobile support
+      mobileCartIcon.addEventListener('touchstart', (e) => {
+        console.log('Mobile cart touched!');
+        e.preventDefault();
         this.toggleCart();
       });
     }
@@ -480,6 +491,12 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileCartIcon: !!mobileCartIcon,
     cartDropdown: !!cartDropdown
   });
+  
+  // Visual debug indicator for mobile cart
+  if (mobileCartIcon) {
+    mobileCartIcon.style.border = '2px solid red';
+    console.log('Mobile cart icon styled for debugging');
+  }
   
   if ((cartIcon || mobileCartIcon) && cartDropdown) {
     cart = new Cart();
