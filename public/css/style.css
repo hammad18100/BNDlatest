@@ -12,6 +12,11 @@ body {
   color: #fff;
   background-color: #000;
   line-height: 1.6;
+  /* Prevent zoom on mobile */
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
 a {
@@ -107,6 +112,11 @@ main {
   min-height: 100vh;
   max-height: 100vh;
   margin: 0;
+  /* Prevent zoom and scaling */
+  transform: none !important;
+  scale: 1 !important;
+  zoom: 1 !important;
+  touch-action: pan-x pan-y;
   border-radius: 0;
   overflow: hidden;
 }
@@ -1650,8 +1660,12 @@ body.products-page, .products-page main {
   width: 100vw;
   height: 100vh;
   background: url('/images/SecondBackground.jpg') center center / cover no-repeat fixed;
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
   opacity: 0;
-  transform: none;
+  transform: none !important;
   z-index: 99999;
   border: none;
   margin: 0;
@@ -1660,6 +1674,12 @@ body.products-page, .products-page main {
   pointer-events: none;
   display: block;
   transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1);
+  /* Prevent zoom on mobile */
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  /* Prevent any scaling or zooming */
+  scale: 1 !important;
+  zoom: 1 !important;
 }
 #secondBg.show {
   opacity: 1;
@@ -1671,14 +1691,54 @@ body.products-page, .products-page main {
   min-height: 100vh;
   max-height: 100vh;
   background: url('/images/SecondBackground.jpg') center center / cover no-repeat;
+  background-size: 100% 100% !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: scroll !important;
   display: block;
   margin: 0;
   border-radius: 0;
   overflow: hidden;
+  /* Prevent zoom on mobile */
+  touch-action: pan-x pan-y;
+  -webkit-overflow-scrolling: touch;
+  /* Prevent any scaling or zooming */
+  transform: none !important;
+  scale: 1 !important;
+  zoom: 1 !important;
+}
+
+/* Prevent zoom and scaling globally */
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  touch-action: pan-x pan-y;
 }
 
 /* --- Mobile Responsive Design --- */
 @media (max-width: 768px) {
+  /* Fix second background zoom issue on mobile */
+  #secondBg.second-background {
+    background-attachment: scroll !important;
+    background: url('/images/SecondBackground.jpg') center center / cover no-repeat scroll !important;
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    transform: none !important;
+    scale: 1 !important;
+    zoom: 1 !important;
+  }
+  
+  .second-background-section {
+    background-attachment: scroll !important;
+    background: url('/images/SecondBackground.jpg') center center / cover no-repeat scroll !important;
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    transform: none !important;
+    scale: 1 !important;
+    zoom: 1 !important;
+  }
   /* Hide desktop navigation on mobile */
   .desktop-nav {
     display: none !important;
