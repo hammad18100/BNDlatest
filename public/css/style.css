@@ -376,8 +376,8 @@ main {
   top: 40px;
   left: 50%;
   transform: translateX(-10.5%);
-  width: 97vw;
-  height: 58vh;
+  width: 1240px;
+  height: 580px;
   background: rgba(47, 45, 45, 0.95);
   display: none;
   justify-content: center;
@@ -398,9 +398,10 @@ main {
   width: 95%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 280px);
   gap: 20px;
   padding: 20px;
+  justify-content: center;
 }
 
 .collection-box {
@@ -414,8 +415,8 @@ main {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 400px;
-  height: 600px;
+  width: 280px;
+  height: 420px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.07);
 }
@@ -436,7 +437,7 @@ main {
 
 .collection-box img {
   width: 100%;
-  height: 600px;
+  height: 420px;
   object-fit: cover;
   margin-bottom: 10px;
 }
