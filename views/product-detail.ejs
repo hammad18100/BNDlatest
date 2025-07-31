@@ -44,6 +44,7 @@
             <button class="size-btn" data-variant-id="<%= variant.variant_id %>" data-size="<%= variant.size %>" data-stock-quantity="<%= variant.stock_quantity %>"><%= variant.size %></button>
           <% }); %>
         </div>
+        <a href="#" class="size-guide-link" data-product-type="<%= isHoodie ? 'hoodie' : 'tee' %>">Size Guide</a>
       </div>
       <div class="form-group">
         <label style="font-size:1.2rem;color:#666;margin-bottom:10px;">Quantity</label>
@@ -70,6 +71,17 @@
     </div>
   </div>
 </main>
+
+<!-- Size Guide Modal -->
+<div id="sizeGuideModal" class="size-guide-modal">
+  <div class="size-guide-content">
+    <button class="size-guide-close" id="sizeGuideClose">&times;</button>
+    <h3>Size Guide</h3>
+    <div class="size-guide-image-container">
+      <img id="sizeGuideImage" src="" alt="Size Guide" />
+    </div>
+  </div>
+</div>
 
 <%- include('partials/footer') %>
 <script>
@@ -141,6 +153,69 @@ thumbBar.addEventListener('wheel', function(e) {
     this.scrollLeft += e.deltaY;
   }
 }, { passive: false });
+
+// Size Guide functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const sizeGuideLink = document.querySelector('.size-guide-link');
+  const sizeGuideModal = document.getElementById('sizeGuideModal');
+  const sizeGuideClose = document.getElementById('sizeGuideClose');
+  const sizeGuideImage = document.getElementById('sizeGuideImage');
+
+  if (sizeGuideLink) {
+    sizeGuideLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      const productType = this.getAttribute('data-product-type');
+      openSizeGuide(productType);
+    });
+  }
+
+  if (sizeGuideClose) {
+    sizeGuideClose.addEventListener('click', function() {
+      closeSizeGuide();
+    });
+  }
+
+  // Close modal when clicking outside
+  if (sizeGuideModal) {
+    sizeGuideModal.addEventListener('click', function(e) {
+      if (e.target === sizeGuideModal) {
+        closeSizeGuide();
+      }
+    });
+  }
+
+  // Close modal on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && sizeGuideModal.classList.contains('show')) {
+      closeSizeGuide();
+    }
+  });
+});
+
+function openSizeGuide(productType) {
+  const sizeGuideModal = document.getElementById('sizeGuideModal');
+  const sizeGuideImage = document.getElementById('sizeGuideImage');
+  
+  if (sizeGuideModal && sizeGuideImage) {
+    // Set the appropriate image based on product type
+    if (productType === 'hoodie') {
+      sizeGuideImage.src = '/images/hoodie_sizechart.png';
+    } else {
+      sizeGuideImage.src = '/images/tee_sizechart.png';
+    }
+    
+    sizeGuideModal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+}
+
+function closeSizeGuide() {
+  const sizeGuideModal = document.getElementById('sizeGuideModal');
+  if (sizeGuideModal) {
+    sizeGuideModal.classList.remove('show');
+    document.body.style.overflow = ''; // Restore scrolling
+  }
+}
 let isDown = false, startX, scrollLeft;
 thumbBar.addEventListener('mousedown', (e) => {
   isDown = true;

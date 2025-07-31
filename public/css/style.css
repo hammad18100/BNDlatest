@@ -2458,6 +2458,28 @@ html {
     padding: 12px;
     font-size: 0.9rem;
   }
+  
+  /* Mobile Size Guide */
+  .size-guide-content {
+    padding: 15px;
+    max-width: 95%;
+    max-height: 95%;
+  }
+  
+  .size-guide-content h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+  
+  .size-guide-image-container {
+    max-height: 80vh;
+  }
+  
+  .size-guide-close {
+    top: 5px;
+    right: 10px;
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2533,6 +2555,93 @@ html {
     min-width: 44px;
     min-height: 44px;
   }
+}
+
+/* Size Guide Styles */
+.size-guide-link {
+  display: inline-block;
+  color: #666;
+  text-decoration: underline;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.size-guide-link:hover {
+  color: #fff;
+}
+
+.size-guide-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.size-guide-modal.show {
+  display: flex;
+  opacity: 1;
+}
+
+.size-guide-content {
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 90%;
+  max-height: 90%;
+  position: relative;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.size-guide-modal.show .size-guide-content {
+  transform: scale(1);
+}
+
+.size-guide-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 10001;
+  transition: color 0.3s ease;
+}
+
+.size-guide-close:hover {
+  color: #ccc;
+}
+
+.size-guide-content h3 {
+  color: #fff;
+  margin: 0 0 20px 0;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.size-guide-image-container {
+  text-align: center;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.size-guide-image-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
 }
 
 /* Desktop styles - hide mobile navigation and mobile cart */
