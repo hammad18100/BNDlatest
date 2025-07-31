@@ -48,6 +48,11 @@ main {
   z-index: 100;
 }
 
+.desktop-nav {
+  display: flex;
+  gap: 30px;
+}
+
 .logo-container {
   position: absolute;
   left: 50%;
@@ -1674,8 +1679,8 @@ body.products-page, .products-page main {
 
 /* --- Mobile Responsive Design --- */
 @media (max-width: 768px) {
-  /* Mobile Navigation */
-  .main-nav {
+  /* Hide desktop navigation on mobile */
+  .desktop-nav {
     display: none !important;
   }
   
@@ -1689,6 +1694,18 @@ body.products-page, .products-page main {
     display: block !important;
   }
   
+  /* Center the logo on mobile */
+  .main-header {
+    justify-content: center;
+    position: relative;
+  }
+  
+  .logo-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
   .mobile-nav-toggle {
     display: block !important;
     background: none;
@@ -1697,8 +1714,9 @@ body.products-page, .products-page main {
     font-size: 1.5rem;
     cursor: pointer;
     padding: 10px;
+    position: absolute;
+    left: 20px;
     z-index: 1001;
-    position: relative;
   }
   
   .mobile-nav {
@@ -1729,10 +1747,13 @@ body.products-page, .products-page main {
   
   .mobile-nav a {
     color: #fff;
-    font-size: 1.5rem;
-    margin: 20px 0;
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 30px 0;
     text-decoration: none;
     transition: color 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
   }
   
   .mobile-nav a:hover {
@@ -1741,13 +1762,18 @@ body.products-page, .products-page main {
   
   .mobile-nav-close {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 30px;
+    right: 30px;
     background: none;
     border: none;
     color: #fff;
-    font-size: 2rem;
+    font-size: 3rem;
     cursor: pointer;
+    transition: color 0.3s;
+  }
+  
+  .mobile-nav-close:hover {
+    color: #aaa;
   }
   
   /* Mobile Header */

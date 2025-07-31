@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (headerActions) {
                 headerActions.style.display = 'none';
             }
+            // Hide desktop navigation on mobile
+            const desktopNav = document.querySelector('.desktop-nav');
+            if (desktopNav) {
+                desktopNav.style.display = 'none';
+            }
         } else {
             mobileNavToggle.style.display = 'none';
             mobileNav.classList.remove('active');
@@ -22,6 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerActions = document.querySelector('.header-actions');
             if (headerActions) {
                 headerActions.style.display = 'flex';
+            }
+            // Show desktop navigation on desktop
+            const desktopNav = document.querySelector('.desktop-nav');
+            if (desktopNav) {
+                desktopNav.style.display = 'flex';
             }
         }
     }

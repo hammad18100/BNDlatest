@@ -11,7 +11,8 @@
 </head>
 <body class="<%= typeof pageClass !== 'undefined' ? pageClass : '' %>">
   <header class="main-header">
-    <nav class="main-nav" aria-label="Main navigation">
+    <!-- Desktop Navigation -->
+    <nav class="main-nav desktop-nav" aria-label="Main navigation">
       <a href="/" class="nav-link">Home</a>
 
       <!-- Dropdown -->
@@ -55,7 +56,7 @@
     </nav>
 
     <!-- Mobile Navigation Toggle -->
-    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open mobile menu" aria-controls="mobileNav" aria-expanded="false" style="display: block;">
+    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open mobile menu" aria-controls="mobileNav" aria-expanded="false">
       &#9776;
     </button>
 
