@@ -474,12 +474,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileCartIcon = document.getElementById('mobileCartIcon');
   const cartDropdown = document.getElementById('cartDropdown');
   
+  // Debug logging
+  console.log('Cart elements found:', {
+    cartIcon: !!cartIcon,
+    mobileCartIcon: !!mobileCartIcon,
+    cartDropdown: !!cartDropdown
+  });
+  
   if ((cartIcon || mobileCartIcon) && cartDropdown) {
     cart = new Cart();
     
     // Ensure cart starts closed
     cartDropdown.classList.remove('active');
     cartDropdown.style.display = 'none';
+    
+    // Force update cart count on initialization
+    setTimeout(() => {
+      cart.updateCartCount();
+    }, 100);
   }
 });
 
