@@ -1722,10 +1722,14 @@ body.products-page, .products-page main {
   
   /* Center the logo on mobile */
   .main-header {
-    justify-content: center;
-    position: relative;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    position: relative !important;
     padding: 10px 20px;
-    min-height: 60px;
+    min-height: 80px;
+    background: #000;
+    border-bottom: 1px solid #333;
   }
   
   .logo-container {
@@ -1748,14 +1752,15 @@ body.products-page, .products-page main {
     color: #fff;
     cursor: pointer;
     padding: 12px;
-    position: absolute;
-    left: 20px;
+    position: relative;
     z-index: 1001;
     transition: color 0.3s;
     flex-direction: column;
     gap: 4px;
     align-items: center;
     justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
   }
 
   .mobile-nav-toggle .dot {
@@ -1768,6 +1773,14 @@ body.products-page, .products-page main {
   
   .mobile-nav-toggle:hover {
     color: #aaa;
+  }
+
+  /* Add a placeholder element on the right to balance the layout */
+  .main-header::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    visibility: hidden;
   }
   
   /* Ensure no navigation elements show on mobile */
@@ -1783,27 +1796,14 @@ body.products-page, .products-page main {
     opacity: 0 !important;
   }
   
-  /* Nuclear option - hide ALL navigation elements */
-  .main-header a[href="/"],
-  .main-header a[href="/products"],
-  .main-header a[href="/about"],
-  .main-header a[href="#"] {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    position: absolute !important;
-    left: -9999px !important;
-  }
+  /* Remove the nuclear option hiding rules */
   
-  /* Hide any text that contains navigation words */
-  .main-header:contains("HOME"),
-  .main-header:contains("COLLECTIONS"),
-  .main-header:contains("ABOUT US") {
-    display: none !important;
-  }
+  /* Remove the aggressive text hiding rules */
   
-  /* Hide ALL navigation elements on mobile - nuclear option */
-  .main-header *:not(.logo-container):not(.mobile-nav-toggle):not(.mobile-nav) {
+  /* Hide specific navigation elements on mobile */
+  .main-header .desktop-nav,
+  .main-header .header-actions,
+  .main-header .cart-container {
     display: none !important;
   }
   

@@ -9,35 +9,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show mobile nav toggle on mobile
     function checkMobile() {
         if (window.innerWidth <= 768) {
-            mobileNavToggle.style.display = 'block';
+            mobileNavToggle.style.display = 'flex';
             // Hide header actions on mobile
             const headerActions = document.querySelector('.header-actions');
             if (headerActions) {
                 headerActions.style.display = 'none';
             }
-            // Hide cart container on mobile
-            const cartContainer = document.querySelector('.cart-container');
-            if (cartContainer) {
-                cartContainer.style.display = 'none';
-            }
             // Hide desktop navigation on mobile
             const desktopNav = document.querySelector('.desktop-nav');
             if (desktopNav) {
                 desktopNav.style.display = 'none';
-            }
-            
-            // Hide all navigation links on mobile
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.style.display = 'none';
-                link.style.visibility = 'hidden';
-            });
-            
-            // Hide collections dropdown on mobile
-            const collectionsContainer = document.querySelector('.collections-menu-container');
-            if (collectionsContainer) {
-                collectionsContainer.style.display = 'none';
-                collectionsContainer.style.visibility = 'hidden';
             }
         } else {
             mobileNavToggle.style.display = 'none';
@@ -47,29 +28,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (headerActions) {
                 headerActions.style.display = 'flex';
             }
-            // Show cart container on desktop
-            const cartContainer = document.querySelector('.cart-container');
-            if (cartContainer) {
-                cartContainer.style.display = 'flex';
-            }
             // Show desktop navigation on desktop
             const desktopNav = document.querySelector('.desktop-nav');
             if (desktopNav) {
                 desktopNav.style.display = 'flex';
-            }
-            
-            // Show all navigation links on desktop
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.style.display = 'inline-block';
-                link.style.visibility = 'visible';
-            });
-            
-            // Show collections dropdown on desktop
-            const collectionsContainer = document.querySelector('.collections-menu-container');
-            if (collectionsContainer) {
-                collectionsContainer.style.display = 'block';
-                collectionsContainer.style.visibility = 'visible';
             }
         }
     }
@@ -78,56 +40,35 @@ document.addEventListener('DOMContentLoaded', () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
-    // Force hide navigation on mobile on page load
-    function forceHideNavigation() {
+    // Simplified mobile navigation handling
+    function setupMobileNavigation() {
         if (window.innerWidth <= 768) {
-            // Hide all possible navigation elements
-            const elementsToHide = [
-                '.desktop-nav',
-                '.nav-link',
-                '.collections-menu-container',
-                '.collections-dropdown',
-                'a[href="/"]',
-                'a[href="/products"]',
-                'a[href="/about"]',
-                'a[href="#"]'
-            ];
+            // Only hide desktop navigation elements
+            const desktopNav = document.querySelector('.desktop-nav');
+            if (desktopNav) {
+                desktopNav.style.display = 'none';
+            }
             
-            elementsToHide.forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(el => {
-                    el.style.display = 'none';
-                    el.style.visibility = 'hidden';
-                    el.style.opacity = '0';
-                    el.style.position = 'absolute';
-                    el.style.left = '-9999px';
-                });
-            });
+            const headerActions = document.querySelector('.header-actions');
+            if (headerActions) {
+                headerActions.style.display = 'none';
+            }
         }
     }
     
     // Run on page load
-    forceHideNavigation();
+    setupMobileNavigation();
     
-    // Also run after a short delay to ensure DOM is fully loaded
-    setTimeout(forceHideNavigation, 100);
-    
-    // Force hide mobile nav on page load
-    function forceHideMobileNav() {
+    // Initialize mobile nav properly
+    function initializeMobileNav() {
         const mobileNav = document.getElementById('mobileNav');
         if (mobileNav) {
             mobileNav.classList.remove('active');
-            mobileNav.style.display = 'none';
-            mobileNav.style.visibility = 'hidden';
-            mobileNav.style.opacity = '0';
-            mobileNav.style.pointerEvents = 'none';
         }
     }
     
-    // Run mobile nav hiding on page load
-    forceHideMobileNav();
-    setTimeout(forceHideMobileNav, 100);
-    setTimeout(forceHideMobileNav, 500);
+    // Run mobile nav initialization on page load
+    initializeMobileNav();
     
     // Close mobile nav when clicking outside
     document.addEventListener('click', (e) => {
