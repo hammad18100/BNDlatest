@@ -1,0 +1,26 @@
+{
+  "name": "bnd",
+  "version": "1.0.0",
+  "description": "BND E-commerce Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": ["ecommerce", "fashion", "nodejs", "express"],
+  "author": "BND",
+  "license": "ISC"
+}

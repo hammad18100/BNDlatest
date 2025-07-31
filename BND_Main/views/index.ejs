@@ -1,0 +1,92 @@
+<%- include('partials/header', { title: 'BND - Breaking Norms Daily' }) %>
+
+<video class="bg-video" id="bgVideo" autoplay loop muted playsinline preload="auto" style="display:block;">
+  <source src="/images/BackgroundVideo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Welcome Overlay Modal -->
+<div id="welcomeOverlay" class="welcome-overlay" style="display:none;">
+  <div class="welcome-modal">
+    <button class="welcome-close" id="welcomeClose">&times;</button>
+    <img src="/images/Welcomeposter.png" alt="Welcome Poster" class="welcome-poster" />
+  </div>
+</div>
+
+<main class="hero">
+  <div class="hero-content">
+    <h1>Breaking Norms Daily.</h1>
+  </div>
+</main>
+
+<section class="second-background-section"></section>
+
+<%- include('partials/footer') %>
+<script>
+console.log('Script loaded');
+
+window.addEventListener('DOMContentLoaded', function() {
+  var vid = document.getElementById('bgVideo');
+  if (vid) {
+    vid.removeAttribute('controls');
+    vid.muted = true;
+    vid.autoplay = true;
+    vid.loop = true;
+    vid.playsInline = true;
+    var playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(function() {
+        // Try again on first user interaction
+        var tryPlay = function() {
+          vid.play();
+          window.removeEventListener('click', tryPlay);
+          window.removeEventListener('keydown', tryPlay);
+          window.removeEventListener('touchstart', tryPlay);
+        };
+        window.addEventListener('click', tryPlay);
+        window.addEventListener('keydown', tryPlay);
+        window.addEventListener('touchstart', tryPlay);
+      });
+    }
+  }
+});
+
+// Welcome overlay logic
+(function() {
+  var overlay = document.getElementById('welcomeOverlay');
+  var closeBtn = document.getElementById('welcomeClose');
+  overlay.style.display = 'flex';
+  closeBtn.addEventListener('click', function() {
+    overlay.style.display = 'none';
+  });
+})();
+
+// Parallax fade-in for second background on scroll
+window.addEventListener('scroll', function() {
+  var secondBg = document.getElementById('secondBg');
+  var trigger = 10; // Lowered for testing
+  console.log('ScrollY:', window.scrollY);
+  if (window.scrollY > trigger) {
+    secondBg.classList.add('show');
+    console.log('Second background shown');
+  } else {
+    secondBg.classList.remove('show');
+    console.log('Second background hidden');
+  }
+});
+
+// Show SecondBackground.jpg when scrolling past the hero section
+window.addEventListener('scroll', function() {
+  var secondBg = document.getElementById('secondBg');
+  var hero = document.querySelector('.hero');
+  var heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
+  console.log('ScrollY:', window.scrollY, 'Hero bottom:', heroBottom);
+  if (window.scrollY > heroBottom - 50) {
+    secondBg.classList.add('show');
+  } else {
+    secondBg.classList.remove('show');
+  }
+});
+</script>
+
+<div id="secondBg" class="second-background"></div>

@@ -1,0 +1,176 @@
+<% let isHoodie = product.name === 'Canvas Boxy Pullover Hoodie'; %>
+<% const productData = {
+  id: product.product_id,
+  name: product.name,
+  price: Number(product.price),
+  image: isHoodie ? '/images/hoodie_front.png' : '/images/shirt_front.png'
+}; %>
+<%- include('partials/header', { title: product.name + ' - BND', pageClass: 'products-page' }) %>
+
+<main class="product-detail-page products-page">
+  <div class="product-detail-flex">
+    <div class="product-image-gallery">
+      <div class="main-image-zoom-container" style="position:relative; overflow:hidden;">
+        <img id="main-product-image" src="/images/<%= isHoodie ? 'hoodie_front.png' : 'shirt_front.png' %>" alt="<%= isHoodie ? 'Hoodie Front' : 'Shirt Front' %>" class="product-image zoomable front-back" style="transition: transform 0.3s; cursor: zoom-in;" />
+      </div>
+      <div class="product-thumbnails scrollable-thumbnails">
+        <img src="/images/<%= isHoodie ? 'hoodie_front.png' : 'shirt_front.png' %>" alt="<%= isHoodie ? 'Hoodie Front' : 'Shirt Front' %>" class="thumbnail-img active front-back" data-img="/images/<%= isHoodie ? 'hoodie_front.png' : 'shirt_front.png' %>" />
+        <img src="/images/<%= isHoodie ? 'hoodie_back.png' : 'shirt_back.png' %>" alt="<%= isHoodie ? 'Hoodie Back' : 'Shirt Back' %>" class="thumbnail-img front-back" data-img="/images/<%= isHoodie ? 'hoodie_back.png' : 'shirt_back.png' %>" />
+        <% if (isHoodie) { %>
+          <img src="/images/SKUShots/Hoodie_girl_front.jpg" alt="Hoodie Girl Front" class="thumbnail-img" data-img="/images/SKUShots/Hoodie_girl_front.jpg" />
+          <img src="/images/SKUShots/Hoodie_girl_side.jpg" alt="Hoodie Girl Side" class="thumbnail-img" data-img="/images/SKUShots/Hoodie_girl_side.jpg" />
+          <img src="/images/SKUShots/Hoodie_girl_side2.jpg" alt="Hoodie Girl Side 2" class="thumbnail-img" data-img="/images/SKUShots/Hoodie_girl_side2.jpg" />
+          <img src="/images/SKUShots/Hoodie_boy_side.jpg" alt="Hoodie Boy Side" class="thumbnail-img" data-img="/images/SKUShots/Hoodie_boy_side.jpg" />
+          <img src="/images/SKUShots/Hoodie_boy_side2.jpg" alt="Hoodie Boy Side 2" class="thumbnail-img" data-img="/images/SKUShots/Hoodie_boy_side2.jpg" />
+          <img src="/images/SKUShots/Hoodie_boy_back.jpg" alt="Hoodie Boy Back" class="thumbnail-img" data-img="/images/SKUShots/Hoodie_boy_back.jpg" />
+        <% } else { %>
+          <img src="/images/SKUShots/Shirt_girl_front.jpg" alt="Shirt Girl Front" class="thumbnail-img" data-img="/images/SKUShots/Shirt_girl_front.jpg" />
+          <img src="/images/SKUShots/Shirt_girl_side.jpg" alt="Shirt Girl Side" class="thumbnail-img" data-img="/images/SKUShots/Shirt_girl_side.jpg" />
+          <img src="/images/SKUShots/Shirt_girl_back.jpg" alt="Shirt Girl Back" class="thumbnail-img" data-img="/images/SKUShots/Shirt_girl_back.jpg" />
+          <img src="/images/SKUShots/Shirt_boy_front.jpg" alt="Shirt Boy Front" class="thumbnail-img" data-img="/images/SKUShots/Shirt_boy_front.jpg" />
+          <img src="/images/SKUShots/Shirt_boy_side.jpg" alt="Shirt Boy Side" class="thumbnail-img" data-img="/images/SKUShots/Shirt_boy_side.jpg" />
+          <img src="/images/SKUShots/Shirt_boy_side_2.jpg" alt="Shirt Boy Side 2" class="thumbnail-img" data-img="/images/SKUShots/Shirt_boy_side_2.jpg" />
+        <% } %>
+      </div>
+    </div>
+    <div class="product-info-large">
+      <div class="product-name"><%= product.name %></div>
+      <div class="product-desc-large"><%= product.description %></div>
+      <div class="product-price-large">RM <%= Number(product.price).toFixed(2) %></div>
+      <div class="form-group">
+        <label style="font-size:1.2rem;color:#666;margin-bottom:10px;">Size</label>
+        <div class="size-selector" id="size-selector">
+          <% variants.forEach(variant => { %>
+            <button class="size-btn" data-variant-id="<%= variant.variant_id %>" data-size="<%= variant.size %>" data-stock-quantity="<%= variant.stock_quantity %>"><%= variant.size %></button>
+          <% }); %>
+        </div>
+      </div>
+      <div class="form-group">
+        <label style="font-size:1.2rem;color:#666;margin-bottom:10px;">Quantity</label>
+        <div class="quantity-box">
+          <button type="button" id="quantity-minus" class="quantity-btn">&#8722;</button>
+          <span id="quantity-number" class="quantity-number">1</span>
+          <button type="button" id="quantity-plus" class="quantity-btn">&#43;</button>
+        </div>
+      </div>
+      <script type="application/json" id="productData">
+<%- JSON.stringify({
+  id: product.product_id,
+  name: product.name,
+  price: Number(product.price),
+  image: isHoodie ? '/images/hoodie_front.png' : '/images/shirt_front.png'
+}) %>
+</script>
+<script>
+  window.productData = JSON.parse(document.getElementById('productData').textContent);
+</script>
+      <button id="orderBtn" class="add-to-cart-btn outlined-btn" onclick="addToCart(window.productData)">Add to cart</button>
+      <button id="buyNowBtn" class="buy-now-btn" onclick="buyNow(window.productData)">Buy it now</button>
+      <p id="orderStatus" style="margin-top: 15px; height: 20px;"></p>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+<script>
+// Thumbnail gallery logic
+const mainImg = document.getElementById('main-product-image');
+const thumbs = document.querySelectorAll('.thumbnail-img');
+thumbs.forEach(thumb => {
+  thumb.addEventListener('click', function() {
+    thumbs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    mainImg.src = this.dataset.img;
+    mainImg.alt = this.alt;
+  });
+});
+// Simple click-to-zoom: zoom image in frame, allow panning, click again to reset
+let zoomed = false;
+let zoomScale = 2;
+let origin = { x: 0.5, y: 0.5 };
+
+mainImg.addEventListener('click', function(e) {
+  zoomed = !zoomed;
+  if (zoomed) {
+    this.style.cursor = 'zoom-out';
+    const rect = this.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    origin = { x, y };
+    setZoomTransform(x, y);
+  } else {
+    this.style.transform = '';
+    this.style.cursor = 'zoom-in';
+  }
+});
+mainImg.addEventListener('mousemove', function(e) {
+  if (!zoomed) return;
+  const rect = this.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width;
+  const y = (e.clientY - rect.top) / rect.height;
+  setZoomTransform(x, y);
+});
+document.addEventListener('click', function(e) {
+  if (zoomed && !mainImg.contains(e.target)) {
+    mainImg.style.transform = '';
+    mainImg.style.cursor = 'zoom-in';
+    zoomed = false;
+  }
+});
+function setZoomTransform(x, y) {
+  mainImg.style.transform = `scale(${zoomScale}) translate(${-((x-0.5)*2)*(zoomScale-1)*50}%, ${-((y-0.5)*2)*(zoomScale-1)*50}%)`;
+}
+// Reset zoom on thumbnail click
+thumbs.forEach((thumb, idx) => {
+  thumb.addEventListener('click', function() {
+    mainImg.style.transform = '';
+    mainImg.style.cursor = 'zoom-in';
+    zoomed = false;
+    if (idx === 0 || idx === 1) {
+      mainImg.classList.add('front-back');
+    } else {
+      mainImg.classList.remove('front-back');
+    }
+  });
+});
+// Fancy horizontal scroll for thumbnails
+const thumbBar = document.querySelector('.scrollable-thumbnails');
+thumbBar.addEventListener('wheel', function(e) {
+  if (e.deltaY !== 0) {
+    e.preventDefault();
+    this.scrollLeft += e.deltaY;
+  }
+}, { passive: false });
+let isDown = false, startX, scrollLeft;
+thumbBar.addEventListener('mousedown', (e) => {
+  isDown = true;
+  thumbBar.classList.add('dragging');
+  startX = e.pageX - thumbBar.offsetLeft;
+  scrollLeft = thumbBar.scrollLeft;
+});
+thumbBar.addEventListener('mouseleave', () => {
+  isDown = false;
+  thumbBar.classList.remove('dragging');
+});
+thumbBar.addEventListener('mouseup', () => {
+  isDown = false;
+  thumbBar.classList.remove('dragging');
+});
+thumbBar.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - thumbBar.offsetLeft;
+  const walk = (x - startX) * 2;
+  thumbBar.scrollLeft = scrollLeft - walk;
+});
+// Size selector active state
+const sizeBtns = document.querySelectorAll('.size-btn');
+sizeBtns.forEach(btn => {
+  btn.addEventListener('click', function() {
+    sizeBtns.forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+// Initialize stock validation
+initializeStockValidation();
+</script>

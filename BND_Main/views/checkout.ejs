@@ -1,0 +1,278 @@
+<%- include('partials/header', { title: 'Checkout - BND' }) %>
+<main class="checkout-main">
+  <h1 class="checkout-title">Your Details &amp; Total</h1>
+  <form id="checkoutForm" class="checkout-form">
+    <div class="form-group">
+      <label for="checkoutName">Name</label>
+      <input type="text" id="checkoutName" name="checkoutName" required autocomplete="name" />
+    </div>
+    <div class="form-group">
+      <label for="checkoutEmail">Email</label>
+      <input type="email" id="checkoutEmail" name="checkoutEmail" required autocomplete="email" />
+    </div>
+    <div class="form-group">
+      <label for="checkoutPhone">Phone</label>
+      <input type="tel" id="checkoutPhone" name="checkoutPhone" required autocomplete="tel" />
+    </div>
+    <div class="form-group">
+      <label for="checkoutAddress">Address</label>
+      <textarea id="checkoutAddress" name="checkoutAddress" rows="3" placeholder="Enter your delivery address" required></textarea>
+    </div>
+    <div class="form-group">
+      <label for="checkoutPostcode">Postcode</label>
+      <input type="text" id="checkoutPostcode" name="checkoutPostcode" required pattern="[0-9]{5}" title="Please enter a valid 5-digit postcode" />
+      <span id="shippingCost" class="shipping-cost"></span>
+    </div>
+    <h2 class="checkout-subtitle">Order Summary</h2>
+    <div id="checkoutCartSummary"></div>
+    <div class="checkout-total-row">
+      <span>Total:</span>
+      <span id="checkoutTotal">RM 0.00</span>
+    </div>
+    <button type="submit" class="checkout-btn">Proceed to Payment</button>
+    <div id="checkoutError" style="color:#ff4444;margin-top:10px;font-size:0.95rem;"></div>
+  </form>
+</main>
+<%- include('partials/footer') %>
+<script>
+// Populate cart summary from localStorage
+function renderCheckoutCart() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const summaryDiv = document.getElementById('checkoutCartSummary');
+  const totalSpan = document.getElementById('checkoutTotal');
+  if (!cart.length) {
+    summaryDiv.innerHTML = '<div style="color:#888;">Your cart is empty.</div>';
+    totalSpan.textContent = 'RM 0.00';
+    return;
+  }
+  let subtotal = 0;
+  let cartHtml = cart.map(item => {
+    const itemTotal = item.price * item.quantity;
+    subtotal += itemTotal;
+    return `<div class='checkout-cart-item'>
+      <span>${item.name} (Size: ${item.size}) x${item.quantity}</span>
+      <span>RM ${itemTotal.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  // Calculate shipping cost
+  const postcode = document.getElementById('checkoutPostcode').value.trim();
+  const shippingCost = postcode.length === 5 ? 
+    (SUBANG_POSTCODES.includes(postcode) ? 0 : SHIPPING_COST) : 0;
+  
+  // Add processing fee
+  const processingFee = 0;
+
+  // Add subtotal, shipping, and processing fee to cart summary
+  cartHtml += `
+    <div class='checkout-cart-item subtotal'>
+      <span>Subtotal:</span>
+      <span>RM ${subtotal.toFixed(2)}</span>
+    </div>
+    <div class='checkout-cart-item shipping'>
+      <span>Shipping:</span>
+      <span>RM ${shippingCost.toFixed(2)}</span>
+    </div>
+    <div class='checkout-cart-item processing'>
+      <span>Processing Fee:</span>
+      <span>RM ${processingFee.toFixed(2)}</span>
+    </div>`;
+
+  summaryDiv.innerHTML = cartHtml;
+  totalSpan.textContent = 'RM ' + (subtotal + shippingCost + processingFee).toFixed(2);
+}
+renderCheckoutCart();
+
+// Handle form submit
+// Define Subang postcodes
+const SUBANG_POSTCODES = ["47500", "47600", "47610", "47620", "47630", "47650"];
+const SHIPPING_COST = 7;
+
+// Function to calculate and update shipping cost
+function updateShippingCost() {
+  const postcode = document.getElementById('checkoutPostcode').value.trim();
+  const shippingCostSpan = document.getElementById('shippingCost');
+  const cost = SUBANG_POSTCODES.includes(postcode) ? 0 : SHIPPING_COST;
+  shippingCostSpan.textContent = postcode.length === 5 ? 
+    `Shipping: RM ${cost.toFixed(2)}` : '';
+  renderCheckoutCart(); // Update total with shipping
+}
+
+// Add postcode input listener
+document.getElementById('checkoutPostcode').addEventListener('input', updateShippingCost);
+
+const checkoutForm = document.getElementById('checkoutForm');
+checkoutForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const name = document.getElementById('checkoutName').value.trim();
+  const email = document.getElementById('checkoutEmail').value.trim();
+  const phone = document.getElementById('checkoutPhone').value.trim();
+  const address = document.getElementById('checkoutAddress').value.trim();
+  const postcode = document.getElementById('checkoutPostcode').value.trim();
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const errorDiv = document.getElementById('checkoutError');
+  errorDiv.textContent = '';
+  if (!name || !email || !phone || !address || !postcode) {
+    errorDiv.textContent = 'Please fill in all fields.';
+    return;
+  }
+  if (!cart.length) {
+    errorDiv.textContent = 'Your cart is empty.';
+    return;
+  }
+  if (postcode.length !== 5 || !/^\d{5}$/.test(postcode)) {
+    errorDiv.textContent = 'Please enter a valid 5-digit postcode.';
+    return;
+  }
+  try {
+    // Transform cart data to match server expectations
+    const transformedCart = cart.map(item => ({
+      variant_id: item.variantId,
+      quantity: item.quantity,
+      price: item.price
+    }));
+    
+    // First, create a pending order
+    const orderResponse = await fetch('/api/create-pending-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        name: name,
+        phone: phone,
+        address: address,
+        postcode: postcode,
+        cart: transformedCart
+      })
+    });
+    
+    const orderData = await orderResponse.json();
+    
+    if (orderData.success) {
+      // Now proceed to payment
+      const paymentResponse = await fetch('/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cart: transformedCart,
+          customer: { name, email, phone, address, postcode },
+          orderId: orderData.orderId
+        })
+      });
+      
+      const paymentData = await paymentResponse.json();
+      
+      if (paymentData.success && paymentData.paymentUrl) {
+        // Clear the cart and redirect to payment
+        localStorage.removeItem('cart');
+        window.location.href = paymentData.paymentUrl;
+      } else {
+        errorDiv.textContent = paymentData.message || 'Payment setup failed.';
+      }
+    } else {
+      errorDiv.textContent = orderData.message || 'Order creation failed.';
+    }
+  } catch (err) {
+    console.error('Checkout error:', err);
+    errorDiv.textContent = 'Checkout error. Please try again.';
+  }
+});
+</script>
+<style>
+.checkout-main {
+  max-width: 480px;
+  margin: 48px auto 64px auto;
+  background: #181818;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 32px 28px 24px 28px;
+}
+.checkout-title {
+  font-size: 2.1rem;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.checkout-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.checkout-form label {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.checkout-form input, .checkout-form textarea {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #222;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+  font-family: inherit;
+}
+.checkout-form input:focus, .checkout-form textarea:focus {
+  border: 1.5px solid #fff;
+  background: #222;
+}
+.checkout-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.checkout-subtitle {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 18px 0 8px 0;
+}
+.checkout-cart-item {
+  display: flex;
+  justify-content: space-between;
+  color: #e0e0e0;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.checkout-cart-item.subtotal,
+.checkout-cart-item.shipping {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #333;
+}
+.shipping-cost {
+  display: block;
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 4px;
+}
+.checkout-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 18px 0 10px 0;
+}
+.checkout-btn {
+  width: 100%;
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.checkout-btn:hover {
+  background: #f0f0f0;
+}
+</style> 
