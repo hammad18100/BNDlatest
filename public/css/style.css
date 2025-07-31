@@ -1689,6 +1689,11 @@ body.products-page, .products-page main {
     display: none !important;
   }
   
+  /* Hide cart icon on mobile */
+  .cart-container {
+    display: none !important;
+  }
+  
   /* Show mobile nav toggle */
   .mobile-nav-toggle {
     display: block !important;
@@ -1698,12 +1703,19 @@ body.products-page, .products-page main {
   .main-header {
     justify-content: center;
     position: relative;
+    padding: 10px 20px;
   }
   
   .logo-container {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 1000;
+  }
+  
+  .logo-container img {
+    height: 60px;
+    max-width: 100%;
   }
   
   .mobile-nav-toggle {
@@ -1711,12 +1723,17 @@ body.products-page, .products-page main {
     background: none;
     border: none;
     color: #fff;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
-    padding: 10px;
+    padding: 12px;
     position: absolute;
     left: 20px;
     z-index: 1001;
+    transition: color 0.3s;
+  }
+  
+  .mobile-nav-toggle:hover {
+    color: #aaa;
   }
   
   .mobile-nav {

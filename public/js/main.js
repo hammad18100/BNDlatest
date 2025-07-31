@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (headerActions) {
                 headerActions.style.display = 'none';
             }
+            // Hide cart container on mobile
+            const cartContainer = document.querySelector('.cart-container');
+            if (cartContainer) {
+                cartContainer.style.display = 'none';
+            }
             // Hide desktop navigation on mobile
             const desktopNav = document.querySelector('.desktop-nav');
             if (desktopNav) {
@@ -27,6 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const headerActions = document.querySelector('.header-actions');
             if (headerActions) {
                 headerActions.style.display = 'flex';
+            }
+            // Show cart container on desktop
+            const cartContainer = document.querySelector('.cart-container');
+            if (cartContainer) {
+                cartContainer.style.display = 'flex';
             }
             // Show desktop navigation on desktop
             const desktopNav = document.querySelector('.desktop-nav');
