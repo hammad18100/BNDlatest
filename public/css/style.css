@@ -1723,7 +1723,7 @@ body.products-page, .products-page main {
   /* Center the logo on mobile */
   .main-header {
     display: flex !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     align-items: center !important;
     position: relative !important;
     padding: 10px 20px;
@@ -1752,36 +1752,33 @@ body.products-page, .products-page main {
     color: #fff;
     cursor: pointer;
     padding: 12px;
-    position: relative;
+    position: absolute;
+    left: 0;
     z-index: 1001;
     transition: color 0.3s;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     align-items: center;
     justify-content: center;
     min-width: 40px;
     min-height: 40px;
   }
 
-  .mobile-nav-toggle .dot {
-    width: 4px;
-    height: 4px;
+  .mobile-nav-toggle .line {
+    width: 20px;
+    height: 2px;
     background-color: #fff;
-    border-radius: 50%;
     display: block;
+    transition: all 0.3s ease;
   }
   
   .mobile-nav-toggle:hover {
     color: #aaa;
   }
 
-  /* Add a placeholder element on the right to balance the layout */
-  .main-header::after {
-    content: '';
-    width: 40px;
-    height: 40px;
-    visibility: hidden;
-  }
+  /* Remove placeholder element since we're using absolute positioning */
+  
+  /* Mobile navigation is hidden by default, only shown on mobile */
   
   /* Ensure no navigation elements show on mobile */
   .main-header nav {
@@ -2129,6 +2126,17 @@ body.products-page, .products-page main {
     padding: 8px 0;
     min-width: 44px;
     min-height: 44px;
+  }
+}
+
+/* Desktop styles - hide mobile navigation */
+@media (min-width: 769px) {
+  .mobile-nav-toggle {
+    display: none !important;
+  }
+  
+  .mobile-nav {
+    display: none !important;
   }
 }
 
