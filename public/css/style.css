@@ -1676,17 +1676,29 @@ body.products-page, .products-page main {
 @media (max-width: 768px) {
   /* Mobile Navigation */
   .main-nav {
-    display: none;
+    display: none !important;
+  }
+  
+  /* Hide header actions on mobile by default */
+  .header-actions {
+    display: none !important;
+  }
+  
+  /* Show mobile nav toggle */
+  .mobile-nav-toggle {
+    display: block !important;
   }
   
   .mobile-nav-toggle {
-    display: block;
+    display: block !important;
     background: none;
     border: none;
     color: #fff;
     font-size: 1.5rem;
     cursor: pointer;
     padding: 10px;
+    z-index: 1001;
+    position: relative;
   }
   
   .mobile-nav {
@@ -1701,6 +1713,14 @@ body.products-page, .products-page main {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  .mobile-nav.active {
+    opacity: 1;
+    visibility: visible;
   }
   
   .mobile-nav.active {
@@ -1733,6 +1753,13 @@ body.products-page, .products-page main {
   /* Mobile Header */
   .main-header {
     padding: 10px 20px;
+    justify-content: space-between;
+  }
+  
+  /* Show only logo and hamburger menu on mobile */
+  .main-header .logo-container {
+    position: static;
+    transform: none;
   }
   
   .logo-container img {

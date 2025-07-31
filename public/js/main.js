@@ -10,9 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkMobile() {
         if (window.innerWidth <= 768) {
             mobileNavToggle.style.display = 'block';
+            // Hide header actions on mobile
+            const headerActions = document.querySelector('.header-actions');
+            if (headerActions) {
+                headerActions.style.display = 'none';
+            }
         } else {
             mobileNavToggle.style.display = 'none';
             mobileNav.classList.remove('active');
+            // Show header actions on desktop
+            const headerActions = document.querySelector('.header-actions');
+            if (headerActions) {
+                headerActions.style.display = 'flex';
+            }
         }
     }
     
@@ -20,11 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // Close mobile nav when clicking outside
+    document.addEventListener('click', (e) => {
+        if (mobileNav.classList.contains('active') && 
+            !mobileNav.contains(e.target) && 
+            !mobileNavToggle.contains(e.target)) {
+            mobileNav.classList.remove('active');
+            mobileNavToggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+    });
+    
     // Toggle mobile nav
     if (mobileNavToggle) {
         mobileNavToggle.addEventListener('click', () => {
             mobileNav.classList.add('active');
+            mobileNav.style.display = 'flex';
             mobileNavToggle.setAttribute('aria-expanded', 'true');
+            // Prevent body scroll when menu is open
+            document.body.style.overflow = 'hidden';
         });
     }
     
@@ -32,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         mobileNavClose.addEventListener('click', () => {
             mobileNav.classList.remove('active');
             mobileNavToggle.setAttribute('aria-expanded', 'false');
+            // Re-enable body scroll
+            document.body.style.overflow = '';
         });
     }
     
@@ -41,6 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', () => {
             mobileNav.classList.remove('active');
             mobileNavToggle.setAttribute('aria-expanded', 'false');
+            // Re-enable body scroll
+            document.body.style.overflow = '';
         });
     });
     
