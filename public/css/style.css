@@ -2187,6 +2187,132 @@ body.products-page, .products-page main {
     cursor: pointer;
     font-size: 1.2rem;
   }
+
+  /* Mobile Cart Page Styles */
+  .mobile-cart-page {
+    padding: 20px;
+    min-height: calc(100vh - 80px);
+    background: #000;
+    color: #fff;
+  }
+
+  .cart-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #333;
+  }
+
+  .cart-page-header h1 {
+    font-size: 2rem;
+    margin: 0;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .cart-page-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+  }
+
+  .cart-items-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+
+  .cart-page-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid #333;
+    background: #111;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+
+  .cart-page-item-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .cart-page-item-details {
+    flex: 1;
+  }
+
+  .cart-page-item-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .cart-page-item-size {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+
+  .cart-page-item-price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .cart-page-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cart-page-footer {
+    background: #111;
+    padding: 20px;
+    border-radius: 8px;
+    border-top: 1px solid #333;
+  }
+
+  .cart-total-section {
+    margin-bottom: 20px;
+  }
+
+  .empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-cart h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .empty-cart p {
+    color: #ccc;
+    margin-bottom: 30px;
+  }
+
+  .shop-now-btn {
+    background: #fff;
+    color: #000;
+    padding: 15px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+  }
   
   /* Mobile Collections */
   .collections-dropdown {

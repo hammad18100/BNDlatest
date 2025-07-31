@@ -97,6 +97,13 @@ app.get('/about', (req, res) => {
     });
 });
 
+// Cart Page
+app.get('/cart', (req, res) => {
+    res.render('cart', { 
+      title: 'Shopping Cart - BND'
+    });
+});
+
 // Checkout Page
 app.get('/checkout', (req, res) => {
   res.render('checkout', { title: 'Checkout - BND' });

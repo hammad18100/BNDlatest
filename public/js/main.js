@@ -255,8 +255,13 @@ class Cart {
       mobileCartIcon.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Mobile cart clicked, toggling cart...');
-        this.toggleCart();
+        console.log('Mobile cart clicked, redirecting to cart page...');
+        // Redirect to cart page on mobile
+        if (window.innerWidth <= 768) {
+          window.location.href = '/cart';
+        } else {
+          this.toggleCart();
+        }
       });
     }
 
@@ -363,6 +368,18 @@ class Cart {
   updateQuantity(index, newQuantity) {
     const item = this.items[index];
     const stockQuantity = parseInt(document.querySelector(`[data-variant-id="${item.variantId}"]`).dataset.stockQuantity || 0);
+    
+    // Ensure newQuantity is a valid number and only increment by 1
+    if (typeof newQuantity !== 'number' || isNaN(newQuantity)) {
+      return;
+    }
+    
+    // For incrementing, ensure it only goes up by 1
+    const currentQuantity = this.items[index].quantity;
+    if (newQuantity > currentQuantity && newQuantity > currentQuantity + 1) {
+      newQuantity = currentQuantity + 1;
+    }
+    
     if (newQuantity > stockQuantity) {
       this.showErrorMessage('Cannot add more than available stock.');
       return;

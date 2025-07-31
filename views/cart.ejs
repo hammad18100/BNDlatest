@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shopping Cart - BND</title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="cart-page">
+  <header class="main-header">
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open mobile menu" aria-controls="mobileNav" aria-expanded="false">
+      <span class="line"></span>
+      <span class="line"></span>
+      <span class="line"></span>
+    </button>
+
+    <div class="logo-container">
+      <a href="/">
+        <img src="/images/BND logo.png" alt="BND Logo">
+      </a>
+    </div>
+
+    <!-- Mobile Cart Icon -->
+    <div class="mobile-cart-container">
+      <button class="mobile-cart-icon" id="mobileCartIcon" type="button" aria-label="Open shopping cart">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" width="20" height="20" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+        </svg>
+        <span class="mobile-cart-count" id="mobileCartCount">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Menu -->
+  <div class="mobile-nav" id="mobileNav" role="menu" aria-label="Mobile navigation">
+    <nav class="mobile-nav-menu">
+      <a href="/" class="mobile-nav-link">Home</a>
+      <a href="/products" class="mobile-nav-link">Collections</a>
+      <a href="/about" class="mobile-nav-link">About Us</a>
+    </nav>
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close mobile menu">
+      &times;
+    </button>
+  </div>
+
+  <!-- Mobile Cart Page Content -->
+  <main class="mobile-cart-page">
+    <div class="cart-page-header">
+      <h1>Shopping Cart</h1>
+      <button class="back-btn" onclick="window.history.back()">Back</button>
+    </div>
+
+    <div class="cart-page-content">
+      <div class="cart-items-container" id="cartItemsContainer">
+        <!-- Cart items will be dynamically added here -->
+      </div>
+
+      <div class="cart-page-footer">
+        <div class="cart-total-section">
+          <div class="cart-total">
+            <span>Total:</span>
+            <span id="cartPageTotal">RM 0.00</span>
+          </div>
+        </div>
+        <button class="checkout-btn" id="cartPageCheckoutBtn" onclick="window.location.href='/checkout'">Checkout</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // Mobile cart page specific functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.cart) {
+        renderMobileCartPage();
+      }
+    });
+
+    function renderMobileCartPage() {
+      const cartItemsContainer = document.getElementById('cartItemsContainer');
+      const cartPageTotal = document.getElementById('cartPageTotal');
+      const cartPageCheckoutBtn = document.getElementById('cartPageCheckoutBtn');
+
+      if (!cartItemsContainer) return;
+
+      if (window.cart.items.length === 0) {
+        cartItemsContainer.innerHTML = `
+          <div class="empty-cart">
+            <h2>Your cart is empty</h2>
+            <p>Add some items to get started!</p>
+            <a href="/products" class="shop-now-btn">Shop Now</a>
+          </div>
+        `;
+        if (cartPageTotal) cartPageTotal.textContent = 'RM 0.00';
+        if (cartPageCheckoutBtn) cartPageCheckoutBtn.disabled = true;
+        return;
+      }
+
+      cartItemsContainer.innerHTML = window.cart.items.map((item, index) => `
+        <div class="cart-page-item">
+          <img src="${item.image}" alt="${item.name}" class="cart-page-item-image">
+          <div class="cart-page-item-details">
+            <div class="cart-page-item-name">${item.name}</div>
+            <div class="cart-page-item-size">Size: ${item.size}</div>
+            <div class="cart-page-item-price">RM ${item.price.toFixed(2)}</div>
+          </div>
+          <div class="cart-page-item-quantity">
+            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, ${item.quantity - 1})">-</button>
+            <span class="quantity-display">${item.quantity}</span>
+            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, ${item.quantity + 1})">+</button>
+          </div>
+          <button class="remove-item" onclick="removeCartItem(${index})">&times;</button>
+        </div>
+      `).join('');
+
+      if (cartPageTotal) cartPageTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
+      if (cartPageCheckoutBtn) cartPageCheckoutBtn.disabled = false;
+    }
+
+    function updateCartItemQuantity(index, newQuantity) {
+      if (window.cart) {
+        // Ensure newQuantity is valid and only increment by 1
+        const currentQuantity = window.cart.items[index].quantity;
+        if (newQuantity > currentQuantity && newQuantity > currentQuantity + 1) {
+          newQuantity = currentQuantity + 1;
+        }
+        
+        window.cart.updateQuantity(index, newQuantity);
+        renderMobileCartPage();
+        // Update cart count in header
+        window.cart.updateCartCount();
+      }
+    }
+
+    function removeCartItem(index) {
+      if (window.cart) {
+        window.cart.removeItem(index);
+        renderMobileCartPage();
+        // Update cart count in header
+        window.cart.updateCartCount();
+      }
+    }
+  </script>
+</body>
+</html> 
