@@ -1,0 +1,29 @@
+<%- include('partials/header', { title: 'The Blank Canvas - BND' }) %>
+
+<main>
+  <h1 class="page-title">The Blank Canvas</h1>
+
+  <section class="collections-grid">
+    <% collections.forEach(collection => { %>
+      <!-- This link will take you to the products page, filtered by this collection -->
+      <a href="/products?collection=<%= encodeURIComponent(collection.category) %>" class="collection-card">
+        <!-- ACTION: Have an image named after the category, e.g., 'noir-collection.png' -->
+        <img src="/images/<%= collection.category.toLowerCase().replace(/\s+/g, '-') %>.png" alt="<%= collection.category %>" class="collection-image">
+        <div class="collection-info">
+          <div class="collection-title"><%= collection.category.toUpperCase() %></div>
+        </div>
+      </a>
+    <% }); %>
+
+    <!-- Example of "Coming Soon" cards -->
+    <a href="#" class="collection-card" style="cursor: not-allowed; opacity: 0.6;">
+      <img src="/images/ComingSoon.png" alt="Coming Soon" class="collection-image">
+      <div class="collection-info">
+        <div class="collection-title">COMING SOON</div>
+        <div class="collection-volume">Volume Two</div>
+      </div>
+    </a>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

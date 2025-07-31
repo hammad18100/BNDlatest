@@ -1,0 +1,307 @@
+<%- include('partials/header', { title: 'Thank You - BND' }) %>
+<main class="thank-you-main">
+  <div class="thank-you-container">
+    <div class="success-icon">✓</div>
+    <h1 class="thank-you-title">Thank You for Your Order!</h1>
+    <p class="thank-you-subtitle">Your order has been successfully placed.</p>
+    
+    <div class="order-details">
+      <h2>Order Details</h2>
+      <div class="order-info">
+        <div class="info-row">
+          <span class="label">Order ID:</span>
+          <span class="value"><%= order.order_id %></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Order Date:</span>
+          <span class="value"><%= new Date(order.order_date).toLocaleDateString() %></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Total Amount:</span>
+          <span class="value">RM <%= Number(order.total_amount).toFixed(2) %></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status:</span>
+          <span class="value status-<%= order.status %>"><%= order.status.charAt(0).toUpperCase() + order.status.slice(1) %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="customer-details">
+      <h2>Customer Information</h2>
+      <div class="customer-info">
+        <div class="info-row">
+          <span class="label">Name:</span>
+          <span class="value"><%= customer.name %></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email:</span>
+          <span class="value"><%= customer.email %></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Phone:</span>
+          <span class="value"><%= customer.phone %></span>
+        </div>
+        <% if (customer.address) { %>
+        <div class="info-row">
+          <span class="label">Address:</span>
+          <span class="value"><%= customer.address %></span>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="order-items">
+      <h2>Order Items</h2>
+      <div class="items-list">
+        <% orderItems.forEach(function(item) { %>
+        <div class="item-row">
+          <div class="item-details">
+            <span class="item-name"><%= item.product_name %></span>
+            <span class="item-variant"><%= item.color %> - <%= item.size %></span>
+          </div>
+          <div class="item-quantity">
+            <span>Qty: <%= item.quantity %></span>
+          </div>
+          <div class="item-price">
+            <span>RM <%= (item.price_at_purchase * item.quantity).toFixed(2) %></span>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <a href="/products" class="btn btn-primary">Continue Shopping</a>
+      <a href="/" class="btn btn-secondary">Back to Home</a>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>
+
+<script>
+// Clear cart immediately when thank you page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Clear the cart from localStorage
+  localStorage.removeItem('cart');
+  
+  // Update cart count display
+  const cartCount = document.getElementById('cartCount');
+  if (cartCount) {
+    cartCount.textContent = '0';
+    cartCount.style.display = 'none';
+  }
+  
+  // Close cart dropdown if open
+  const cartDropdown = document.getElementById('cartDropdown');
+  if (cartDropdown) {
+    cartDropdown.classList.remove('active');
+  }
+  
+  console.log('Cart cleared after successful order');
+});
+</script>
+
+<style>
+.thank-you-main {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  padding: 40px 20px;
+}
+
+.thank-you-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #181818;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 40px;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: #4CAF50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: white;
+  margin: 0 auto 20px;
+}
+
+.thank-you-title {
+  font-size: 2.5rem;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.thank-you-subtitle {
+  color: #ccc;
+  text-align: center;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+}
+
+.order-details, .customer-details, .order-items {
+  margin-bottom: 30px;
+}
+
+.order-details h2, .customer-details h2, .order-items h2 {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 8px;
+}
+
+.order-info, .customer-info {
+  background: #222;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #333;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #ccc;
+  font-weight: 500;
+}
+
+.value {
+  color: #fff;
+  font-weight: 600;
+}
+
+.status-paid {
+  color: #4CAF50;
+}
+
+.status-pending {
+  color: #FF9800;
+}
+
+.items-list {
+  background: #222;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.item-variant {
+  display: block;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.item-quantity {
+  color: #ccc;
+  margin: 0 20px;
+}
+
+.item-price {
+  color: #fff;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #fff;
+  color: #000;
+}
+
+.btn-primary:hover {
+  background: #f0f0f0;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+.btn-secondary:hover {
+  background: #fff;
+  color: #000;
+}
+
+@media (max-width: 768px) {
+  .thank-you-container {
+    padding: 20px;
+  }
+  
+  .thank-you-title {
+    font-size: 2rem;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .item-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+</style> 

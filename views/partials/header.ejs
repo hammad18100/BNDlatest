@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="<%= typeof pageClass !== 'undefined' ? pageClass : '' %>">
+  <header class="main-header">
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="/" class="nav-link">Home</a>
+
+      <!-- Dropdown -->
+      <div class="collections-menu-container">
+        <a href="#" class="nav-link" aria-haspopup="true" aria-expanded="false" id="collectionsMenuButton">Collections</a>
+        <div class="collections-dropdown" role="menu" aria-labelledby="collectionsMenuButton">
+          <div class="collections-panel"> 
+            <a href="/products" class="collection-box">
+              <img src="/images/blank-canvas-poster.jpg" alt="THE BLANK CANVAS" />
+              <div class="collection-meta">
+                <div class="collection-title">The Blank Canvas</div>
+                <div class="collection-volume">Volume One</div>
+              </div>
+            </a>
+            <div class="collection-box">
+              <img src="/images/ComingSoon.png" alt="Coming Soon" />
+              <div class="collection-meta">
+                <div class="collection-title">COMING SOON</div>
+                <div class="collection-volume">Volume Two</div>
+              </div>
+            </div>
+            <div class="collection-box">
+              <img src="/images/ComingSoon.png" alt="Coming Soon" />
+              <div class="collection-meta">
+                <div class="collection-title">COMING SOON</div>
+                <div class="collection-volume">Volume Three</div>
+              </div>
+            </div>
+            <div class="collection-box">
+              <img src="/images/ComingSoon.png" alt="Coming Soon" />
+              <div class="collection-meta">
+                <div class="collection-title">COMING SOON</div>
+                <div class="collection-volume">Volume Four</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a href="/about" class="nav-link">About Us</a>
+    </nav>
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open mobile menu" aria-controls="mobileNav" aria-expanded="false" style="display: block;">
+      &#9776;
+    </button>
+
+    <div class="logo-container">
+      <a href="/">
+        <img src="/images/BND logo.png" alt="BND Logo">
+      </a>
+    </div>
+
+    <div class="header-actions">
+      <div class="cart-container">
+        <div class="cart-icon" id="cartIcon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" width="20" height="20" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+          </svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </div>
+        <!-- Cart Dropdown -->
+        <div class="cart-dropdown" id="cartDropdown">
+          <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="close-cart" id="closeCart">&times;</button>
+          </div>
+          <div class="cart-items" id="cartItems">
+            <!-- Cart items will be dynamically added here -->
+          </div>
+          <!-- Customer Info Form (hidden by default) -->
+          <form id="customerInfoForm" class="customer-info-form" style="display:none;">
+            <div class="form-group">
+              <label for="customerName">Name</label>
+              <input type="text" id="customerName" name="customerName" required autocomplete="name" />
+            </div>
+            <div class="form-group">
+              <label for="customerEmail">Email</label>
+              <input type="email" id="customerEmail" name="customerEmail" required autocomplete="email" />
+            </div>
+            <div class="form-group">
+              <label for="customerPhone">Phone</label>
+              <input type="tel" id="customerPhone" name="customerPhone" required autocomplete="tel" />
+            </div>
+            <button type="submit" class="checkout-btn">Proceed to Payment</button>
+            <div id="checkoutError" style="color:#ff4444;margin-top:10px;font-size:0.95rem;"></div>
+          </form>
+          <div class="cart-footer">
+            <div class="cart-total">
+              <span>Total:</span>
+              <span id="cartTotal">RM 0.00</span>
+            </div>
+            <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Menu -->
+  <div class="mobile-nav" id="mobileNav" role="menu" aria-label="Mobile navigation">
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close mobile menu">×</button>
+    <a href="/">Home</a>
+    <a href="/products">Collections</a>
+    <a href="/about">About Us</a>
+  </div>

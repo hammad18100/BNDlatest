@@ -1,0 +1,31 @@
+<%- include('partials/header', { title: title, pageClass: 'products-page' }) %>
+
+<main>
+  <h1 class="page-title"><%= title %></h1>
+
+  <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-banner <%= message.includes('failed') ? 'error' : '' %>">
+      <%= message %>
+    </div>
+  <% } %>
+
+  <section class="product-grid">
+    <% if (products.length > 0) { %>
+      <% products.forEach(product => { %>
+        <a href="/products/<%= product.product_id %>" class="product-card">
+          <!-- ACTION: Name your images product-1.png, product-2.png, etc. -->
+          <img src="/images/product-<%= product.product_id %>.png" alt="<%= product.name %>" class="product-image" />
+          <div class="product-info">
+            <div class="product-name"><%= product.name %></div>
+            <div class="product-desc"><%= product.description %></div>
+            <div class="product-price">RM <%= Number(product.price).toFixed(2) %></div>
+          </div>
+        </a>
+      <% }); %>
+    <% } else { %>
+        <p style="text-align: center; grid-column: 1 / -1;">No products found in this collection.</p>
+    <% } %>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
