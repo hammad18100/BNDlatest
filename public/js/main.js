@@ -556,7 +556,13 @@ function addToCart(productData) {
     return;
   }
   const quantityInput = document.getElementById('quantity-number');
-  const quantity = parseInt(quantityInput.textContent);
+  
+  // Validate and get the current quantity
+  let quantity = parseInt(quantityInput.textContent) || 1;
+  quantity = Math.max(1, quantity); // Ensure minimum of 1
+  
+  console.log('Adding to cart with quantity:', quantity);
+  
   const stockQuantity = parseInt(selectedSize.dataset.stockQuantity || 0);
   // Check cart for this variant
   const cartItem = cart.items.find(item => item.variantId === selectedSize.dataset.variantId);
@@ -578,6 +584,7 @@ function addToCart(productData) {
   // After adding, reset quantity to 1
   if (quantityInput) {
     quantityInput.textContent = '1';
+    console.log('Reset quantity to 1 after adding to cart');
     updateQuantityButtonsState(1, stockQuantity - (cartQty + quantity));
   }
 }
@@ -647,11 +654,12 @@ function initializeStockValidation() {
         currentVariantId = variantId;
         maxStock = availableStock;
         
-        // Always reset quantity to 1 when size changes
-        quantityInput.textContent = '1';
-        
-        // Update quantity buttons state immediately
-        updateQuantityButtonsState(1, availableStock);
+              // Always reset quantity to 1 when size changes
+      quantityInput.textContent = '1';
+      console.log('Size changed, resetting quantity to 1');
+      
+      // Update quantity buttons state immediately
+      updateQuantityButtonsState(1, availableStock);
         
         // Show stock info with cart consideration
         showStockInfoWithCart(availableStock, variantId);
@@ -660,23 +668,36 @@ function initializeStockValidation() {
     
     // Quantity button handlers
     if (quantityMinus && quantityPlus) {
-      quantityMinus.addEventListener('click', () => {
-        const currentQty = parseInt(quantityInput.textContent);
+      // Remove existing event listeners to prevent duplicates
+      quantityMinus.removeEventListener('click', quantityMinus._clickHandler);
+      quantityPlus.removeEventListener('click', quantityPlus._clickHandler);
+      
+      // Create new handlers
+      quantityMinus._clickHandler = () => {
+        const currentQty = parseInt(quantityInput.textContent) || 1;
+        console.log('Minus clicked, currentQty:', currentQty);
         if (currentQty > 1) {
           const newQty = currentQty - 1;
-          quantityInput.textContent = newQty;
+          console.log('Setting new quantity to:', newQty);
+          quantityInput.textContent = newQty.toString();
           updateQuantityButtonsState(newQty, maxStock);
         }
-      });
+      };
       
-      quantityPlus.addEventListener('click', () => {
-        const currentQty = parseInt(quantityInput.textContent);
+      quantityPlus._clickHandler = () => {
+        const currentQty = parseInt(quantityInput.textContent) || 1;
+        console.log('Plus clicked, currentQty:', currentQty, 'maxStock:', maxStock);
         if (currentQty < maxStock) {
           const newQty = currentQty + 1;
-          quantityInput.textContent = newQty;
+          console.log('Setting new quantity to:', newQty);
+          quantityInput.textContent = newQty.toString();
           updateQuantityButtonsState(newQty, maxStock);
         }
-      });
+      };
+      
+      // Add event listeners
+      quantityMinus.addEventListener('click', quantityMinus._clickHandler);
+      quantityPlus.addEventListener('click', quantityPlus._clickHandler);
     }
     
     // Initialize with first size selected (if any)
@@ -697,6 +718,18 @@ function updateQuantityButtonsState(currentQty, maxStock) {
   const quantityMinus = document.getElementById('quantity-minus');
   const quantityPlus = document.getElementById('quantity-plus');
   const addToCartBtn = document.getElementById('orderBtn');
+  const quantityInput = document.getElementById('quantity-number');
+  
+  // Ensure currentQty is valid
+  currentQty = Math.max(1, Math.min(currentQty, maxStock));
+  
+  // Update the input to ensure it shows the correct value
+  if (quantityInput) {
+    quantityInput.textContent = currentQty.toString();
+  }
+  
+  console.log('Updating quantity buttons state:', { currentQty, maxStock });
+  
   if (quantityMinus) {
     quantityMinus.disabled = currentQty <= 1 || maxStock === 0;
     quantityMinus.style.opacity = (currentQty <= 1 || maxStock === 0) ? '0.5' : '1';
@@ -843,10 +876,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const quantityInput = document.getElementById('quantity-number');
   if (quantityInput) {
     quantityInput.textContent = '1';
+    console.log('Initialized quantity input to 1');
   }
 
   // Initialize stock validation if on product detail page
   if (typeof initializeStockValidation === 'function') {
     initializeStockValidation();
   }
+  
+  // Add a global function to validate and fix quantity
+  window.validateQuantity = () => {
+    const quantityInput = document.getElementById('quantity-number');
+    if (quantityInput) {
+      let currentQty = parseInt(quantityInput.textContent) || 1;
+      currentQty = Math.max(1, currentQty); // Ensure minimum of 1
+      quantityInput.textContent = currentQty.toString();
+      console.log('Validated quantity:', currentQty);
+      return currentQty;
+    }
+    return 1;
+  };
+  
+  // Validate quantity every second to ensure it's always correct
+  setInterval(() => {
+    if (document.getElementById('quantity-number')) {
+      window.validateQuantity();
+    }
+  }, 1000);
 });

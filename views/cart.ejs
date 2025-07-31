@@ -80,13 +80,17 @@
   <script>
     // Mobile cart page specific functionality
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('Mobile cart page loaded');
+      
       // Initialize cart if not already done
       if (!window.cart) {
+        console.log('Creating new cart instance');
         window.cart = new Cart();
       }
       
       // Ensure cart is properly loaded from localStorage
       window.cart.items = JSON.parse(localStorage.getItem('cart')) || [];
+      console.log('Cart items loaded:', window.cart.items);
       window.cart.updateCartCount();
       
       renderMobileCartPage();
@@ -129,20 +133,25 @@
       }
 
       cartItemsContainer.innerHTML = window.cart.items.map((item, index) => `
-        <div class="cart-page-item">
+        <div class="cart-page-item" data-item-index="${index}">
           <div class="cart-page-item-details">
             <div class="cart-page-item-name">${item.name}</div>
             <div class="cart-page-item-size">Size: ${item.size}</div>
             <div class="cart-page-item-price">RM ${item.price.toFixed(2)}</div>
           </div>
           <div class="cart-page-item-quantity">
-            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, ${item.quantity - 1})">-</button>
+            <button class="quantity-btn minus-btn" data-index="${index}">-</button>
             <span class="quantity-display">${item.quantity}</span>
-            <button class="quantity-btn" onclick="updateCartItemQuantity(${index}, ${item.quantity + 1})">+</button>
+            <button class="quantity-btn plus-btn" data-index="${index}">+</button>
           </div>
-          <button class="remove-item" onclick="removeCartItem(${index})">&times;</button>
+          <button class="remove-item" data-index="${index}">&times;</button>
         </div>
       `).join('');
+
+      // Add event listeners to the buttons
+      setTimeout(() => {
+        addMobileCartEventListeners();
+      }, 100);
 
       if (cartPageTotal) cartPageTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
       if (cartPageCheckoutBtn) cartPageCheckoutBtn.disabled = false;
@@ -188,6 +197,67 @@
         // Update cart count in header
         window.cart.updateCartCount();
       }
+    }
+
+    function addMobileCartEventListeners() {
+      console.log('Adding mobile cart event listeners');
+      
+      // Add event listeners for minus buttons
+      const minusButtons = document.querySelectorAll('.minus-btn');
+      minusButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const index = parseInt(button.dataset.index);
+          console.log('Minus button clicked for index:', index);
+          
+          if (window.cart && window.cart.items[index]) {
+            const currentQuantity = window.cart.items[index].quantity;
+            const newQuantity = Math.max(1, currentQuantity - 1);
+            console.log('Updating quantity from', currentQuantity, 'to', newQuantity);
+            window.cart.updateQuantity(index, newQuantity);
+            renderMobileCartPage();
+            window.cart.updateCartCount();
+          }
+        });
+      });
+
+      // Add event listeners for plus buttons
+      const plusButtons = document.querySelectorAll('.plus-btn');
+      plusButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const index = parseInt(button.dataset.index);
+          console.log('Plus button clicked for index:', index);
+          
+          if (window.cart && window.cart.items[index]) {
+            const currentQuantity = window.cart.items[index].quantity;
+            const newQuantity = currentQuantity + 1;
+            console.log('Updating quantity from', currentQuantity, 'to', newQuantity);
+            window.cart.updateQuantity(index, newQuantity);
+            renderMobileCartPage();
+            window.cart.updateCartCount();
+          }
+        });
+      });
+
+      // Add event listeners for remove buttons
+      const removeButtons = document.querySelectorAll('.remove-item');
+      removeButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const index = parseInt(button.dataset.index);
+          console.log('Remove button clicked for index:', index);
+          
+          if (window.cart) {
+            window.cart.removeItem(index);
+            renderMobileCartPage();
+            window.cart.updateCartCount();
+          }
+        });
+      });
     }
   </script>
 </body>
