@@ -2043,10 +2043,15 @@ body.products-page, .products-page main {
     background: rgba(0,0,0,0.95) !important;
     z-index: 1000 !important;
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
   }
 
   .cart-dropdown.active {
-    display: block !important;
+    display: flex !important;
+    flex-direction: column;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
   
   .cart-header {

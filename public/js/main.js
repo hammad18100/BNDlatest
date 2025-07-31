@@ -252,18 +252,10 @@ class Cart {
     }
 
     if (mobileCartIcon) {
-      console.log('Mobile cart icon found, adding click listener');
       mobileCartIcon.addEventListener('click', (e) => {
-        console.log('Mobile cart clicked!');
         e.preventDefault();
         e.stopPropagation();
-        this.toggleCart();
-      });
-      
-      // Add touch event for better mobile support
-      mobileCartIcon.addEventListener('touchstart', (e) => {
-        console.log('Mobile cart touched!');
-        e.preventDefault();
+        console.log('Mobile cart clicked, toggling cart...');
         this.toggleCart();
       });
     }
@@ -290,13 +282,17 @@ class Cart {
   }
 
   toggleCart() {
+    console.log('toggleCart called, current isOpen:', this.isOpen);
     this.isOpen = !this.isOpen;
     const cartDropdown = document.getElementById('cartDropdown');
+    console.log('Cart dropdown found:', !!cartDropdown);
     if (cartDropdown) {
       if (this.isOpen) {
         cartDropdown.classList.add('active');
+        console.log('Cart opened');
       } else {
         cartDropdown.classList.remove('active');
+        console.log('Cart closed');
       }
     }
   }
@@ -485,18 +481,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileCartIcon = document.getElementById('mobileCartIcon');
   const cartDropdown = document.getElementById('cartDropdown');
   
-  // Debug logging
-  console.log('Cart elements found:', {
+  // Initialize cart functionality
+  console.log('Initializing cart with elements:', {
     cartIcon: !!cartIcon,
     mobileCartIcon: !!mobileCartIcon,
     cartDropdown: !!cartDropdown
   });
-  
-  // Visual debug indicator for mobile cart
-  if (mobileCartIcon) {
-    mobileCartIcon.style.border = '2px solid red';
-    console.log('Mobile cart icon styled for debugging');
-  }
   
   if ((cartIcon || mobileCartIcon) && cartDropdown) {
     cart = new Cart();
