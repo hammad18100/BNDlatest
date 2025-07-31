@@ -9,7 +9,7 @@
 <div id="welcomeOverlay" class="welcome-overlay" style="display:none;">
   <div class="welcome-modal">
     <button class="welcome-close" id="welcomeClose">&times;</button>
-    <img src="/images/Welcomeposter.png" alt="Welcome Poster" class="welcome-poster" />
+    <img src="/images/WelcomePoster.png" alt="Welcome Poster" class="welcome-poster" />
   </div>
 </div>
 
@@ -55,10 +55,45 @@ window.addEventListener('DOMContentLoaded', function() {
 (function() {
   var overlay = document.getElementById('welcomeOverlay');
   var closeBtn = document.getElementById('welcomeClose');
-  overlay.style.display = 'flex';
-  closeBtn.addEventListener('click', function() {
-    overlay.style.display = 'none';
-  });
+  
+  // Ensure elements exist before proceeding
+  if (overlay && closeBtn) {
+    // Show overlay after a short delay to ensure page is loaded
+    setTimeout(function() {
+      overlay.style.display = 'flex';
+      // Add a small delay for the display change, then add the show class
+      setTimeout(function() {
+        overlay.classList.add('show');
+      }, 10);
+    }, 500);
+    
+    closeBtn.addEventListener('click', function() {
+      overlay.classList.remove('show');
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 300);
+    });
+    
+    // Also close on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && overlay.classList.contains('show')) {
+        overlay.classList.remove('show');
+        setTimeout(function() {
+          overlay.style.display = 'none';
+        }, 300);
+      }
+    });
+    
+    // Close on overlay background click
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        overlay.classList.remove('show');
+        setTimeout(function() {
+          overlay.style.display = 'none';
+        }, 300);
+      }
+    });
+  }
 })();
 
 // Parallax fade-in for second background on scroll
