@@ -675,6 +675,8 @@ function initializeStockValidation() {
       const variantId = firstSizeBtn.dataset.variantId;
       const availableStock = getAvailableStock(variantId);
       maxStock = availableStock;
+      // Always start with quantity 1
+      quantityInput.textContent = '1';
       updateQuantityButtonsState(1, availableStock);
       showStockInfoWithCart(availableStock, variantId);
     }
@@ -793,3 +795,43 @@ function showStockInfoWithCart(availableStock, variantId) {
   // Also update button states for out of stock
   updateQuantityButtonsState(1, availableStock);
 }
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize cart functionality
+  console.log('Initializing cart with elements:', {
+    cartIcon: !!document.getElementById('cartIcon'),
+    mobileCartIcon: !!document.getElementById('mobileCartIcon'),
+    cartDropdown: !!document.getElementById('cartDropdown')
+  });
+
+  const cartIcon = document.getElementById('cartIcon');
+  const mobileCartIcon = document.getElementById('mobileCartIcon');
+  const cartDropdown = document.getElementById('cartDropdown');
+
+  if ((cartIcon || mobileCartIcon) && cartDropdown) {
+    cart = new Cart();
+    // Ensure cart starts closed
+    cartDropdown.classList.remove('active');
+    cartDropdown.style.display = 'none';
+    cartDropdown.style.opacity = '0';
+    cartDropdown.style.visibility = 'hidden';
+    cartDropdown.style.pointerEvents = 'none';
+
+    // Force update cart count on initialization
+    setTimeout(() => {
+      cart.updateCartCount();
+    }, 100);
+  }
+
+  // Always ensure quantity starts at 1 on product pages
+  const quantityInput = document.getElementById('quantity-number');
+  if (quantityInput) {
+    quantityInput.textContent = '1';
+  }
+
+  // Initialize stock validation if on product detail page
+  if (typeof initializeStockValidation === 'function') {
+    initializeStockValidation();
+  }
+});

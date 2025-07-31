@@ -125,7 +125,6 @@
 
       cartItemsContainer.innerHTML = window.cart.items.map((item, index) => `
         <div class="cart-page-item">
-          <img src="${item.image}" alt="${item.name}" class="cart-page-item-image">
           <div class="cart-page-item-details">
             <div class="cart-page-item-name">${item.name}</div>
             <div class="cart-page-item-size">Size: ${item.size}</div>
@@ -148,8 +147,20 @@
       if (window.cart) {
         // Ensure newQuantity is valid and only increment by 1
         const currentQuantity = window.cart.items[index].quantity;
+        
+        // For incrementing, ensure it only goes up by 1
         if (newQuantity > currentQuantity && newQuantity > currentQuantity + 1) {
           newQuantity = currentQuantity + 1;
+        }
+        
+        // For decrementing, ensure it only goes down by 1
+        if (newQuantity < currentQuantity && newQuantity < currentQuantity - 1) {
+          newQuantity = currentQuantity - 1;
+        }
+        
+        // Don't allow quantity less than 1
+        if (newQuantity < 1) {
+          newQuantity = 1;
         }
         
         window.cart.updateQuantity(index, newQuantity);

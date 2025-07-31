@@ -2235,19 +2235,13 @@ body.products-page, .products-page main {
   .cart-page-item {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 15px;
     padding: 20px;
     border-bottom: 1px solid #333;
     background: #111;
     border-radius: 8px;
     margin-bottom: 15px;
-  }
-
-  .cart-page-item-image {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
   }
 
   .cart-page-item-details {
