@@ -53,6 +53,11 @@
       <h1>Shopping Cart</h1>
       <button class="back-btn" onclick="window.history.back()">Back</button>
     </div>
+    
+    <!-- Success message for added items -->
+    <div id="cartSuccessMessage" class="cart-success-message" style="display: none;">
+      <span>Item added to cart successfully!</span>
+    </div>
 
     <div class="cart-page-content">
       <div class="cart-items-container" id="cartItemsContainer">
@@ -75,10 +80,28 @@
   <script>
     // Mobile cart page specific functionality
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.cart) {
-        renderMobileCartPage();
+      // Initialize cart if not already done
+      if (!window.cart) {
+        window.cart = new Cart();
+      }
+      renderMobileCartPage();
+      
+      // Show success message if redirected from product page
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('added') === 'true') {
+        showCartSuccessMessage();
       }
     });
+
+    function showCartSuccessMessage() {
+      const successMessage = document.getElementById('cartSuccessMessage');
+      if (successMessage) {
+        successMessage.style.display = 'block';
+        setTimeout(() => {
+          successMessage.style.display = 'none';
+        }, 3000);
+      }
+    }
 
     function renderMobileCartPage() {
       const cartItemsContainer = document.getElementById('cartItemsContainer');

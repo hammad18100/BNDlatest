@@ -347,6 +347,14 @@ class Cart {
     this.updateCartCount();
     this.renderCart();
     this.showAddToCartMessage();
+    
+    // On mobile, redirect to cart page after adding item
+    if (window.innerWidth <= 768 && window.location.pathname !== '/cart') {
+      setTimeout(() => {
+        window.location.href = '/cart?added=true';
+      }, 500); // Small delay to show the add to cart message
+    }
+    
     // Refresh stock validation on product detail pages
     if (typeof initializeStockValidation === 'function') {
       initializeStockValidation();
@@ -557,12 +565,10 @@ function addToCart(productData) {
     quantity: quantity
   };
   cart.addItem(product);
-  // After adding, set quantity to cartQty+1 (if stock allows), else to max available
-  let newQty = cartQty + 1;
-  if (newQty > stockQuantity) newQty = stockQuantity;
+  // After adding, reset quantity to 1
   if (quantityInput) {
-    quantityInput.textContent = newQty;
-    updateQuantityButtonsState(newQty, stockQuantity - cartQty);
+    quantityInput.textContent = '1';
+    updateQuantityButtonsState(1, stockQuantity - (cartQty + quantity));
   }
 }
 

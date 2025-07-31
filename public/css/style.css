@@ -2313,6 +2313,16 @@ body.products-page, .products-page main {
     font-weight: bold;
     display: inline-block;
   }
+
+  .cart-success-message {
+    background: #4CAF50;
+    color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+  }
   
   /* Mobile Collections */
   .collections-dropdown {
