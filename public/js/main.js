@@ -289,9 +289,17 @@ class Cart {
     if (cartDropdown) {
       if (this.isOpen) {
         cartDropdown.classList.add('active');
+        cartDropdown.style.display = 'flex';
+        cartDropdown.style.opacity = '1';
+        cartDropdown.style.visibility = 'visible';
+        cartDropdown.style.pointerEvents = 'auto';
         console.log('Cart opened');
       } else {
         cartDropdown.classList.remove('active');
+        cartDropdown.style.display = 'none';
+        cartDropdown.style.opacity = '0';
+        cartDropdown.style.visibility = 'hidden';
+        cartDropdown.style.pointerEvents = 'none';
         console.log('Cart closed');
       }
     }
