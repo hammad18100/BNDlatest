@@ -1673,7 +1673,8 @@ body.products-page, .products-page main {
   overflow: hidden;
   pointer-events: none;
   display: block;
-  transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1);
+  /* Remove all transitions and effects */
+  transition: none !important;
   /* Prevent zoom on mobile */
   touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
@@ -1683,6 +1684,10 @@ body.products-page, .products-page main {
 }
 #secondBg.show {
   opacity: 1;
+  /* Remove any additional effects */
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
 }
 
 .second-background-section {
@@ -1699,6 +1704,10 @@ body.products-page, .products-page main {
   margin: 0;
   border-radius: 0;
   overflow: hidden;
+  /* Remove all transitions and effects */
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
   /* Prevent zoom on mobile */
   touch-action: pan-x pan-y;
   -webkit-overflow-scrolling: touch;
@@ -1713,6 +1722,21 @@ html {
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   touch-action: pan-x pan-y;
+}
+
+/* Remove all effects from second background */
+#secondBg,
+#secondBg *,
+.second-background-section,
+.second-background-section * {
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
 }
 
 /* --- Mobile Responsive Design --- */
@@ -2460,25 +2484,63 @@ html {
   }
   
   /* Mobile Size Guide */
+  .size-guide-link {
+    font-size: 1.2rem;
+    margin-top: 15px;
+    padding: 12px 0;
+    min-height: 48px;
+    text-align: center;
+    display: block;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid #333;
+  }
+  
+  .size-guide-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
   .size-guide-content {
     padding: 15px;
     max-width: 95%;
     max-height: 95%;
+    margin: 20px;
   }
   
   .size-guide-content h3 {
-    font-size: 1.2rem;
-    margin-bottom: 15px;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
   }
   
   .size-guide-image-container {
-    max-height: 80vh;
+    max-height: 75vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .size-guide-image-container img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
   }
   
   .size-guide-close {
-    top: 5px;
-    right: 10px;
-    font-size: 1.5rem;
+    top: 10px;
+    right: 15px;
+    font-size: 2rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50%;
+    border: 1px solid #333;
+  }
+  
+  .size-guide-modal {
+    padding: 10px;
   }
 }
 
@@ -2562,10 +2624,13 @@ html {
   display: inline-block;
   color: #666;
   text-decoration: underline;
-  font-size: 0.9rem;
-  margin-top: 8px;
+  font-size: 1.1rem;
+  margin-top: 12px;
   cursor: pointer;
   transition: color 0.3s ease;
+  padding: 8px 0;
+  min-height: 44px;
+  line-height: 1.4;
 }
 
 .size-guide-link:hover {
@@ -2585,6 +2650,9 @@ html {
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
+  /* Mobile touch improvements */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
 }
 
 .size-guide-modal.show {
@@ -2642,6 +2710,12 @@ html {
   max-width: 100%;
   height: auto;
   border-radius: 4px;
+  /* Prevent zoom on mobile */
+  touch-action: pan-x pan-y;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* Desktop styles - hide mobile navigation and mobile cart */

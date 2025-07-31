@@ -102,11 +102,16 @@ window.addEventListener('scroll', function() {
   var hero = document.querySelector('.hero');
   if (hero && secondBg) {
     var heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
-    console.log('ScrollY:', window.scrollY, 'Hero bottom:', heroBottom);
     if (window.scrollY > heroBottom - 50) {
-      secondBg.classList.add('show');
+      // Remove any existing classes and add show instantly
+      secondBg.className = 'second-background show';
+      secondBg.style.opacity = '1';
+      secondBg.style.display = 'block';
     } else {
-      secondBg.classList.remove('show');
+      // Remove show class and hide instantly
+      secondBg.className = 'second-background';
+      secondBg.style.opacity = '0';
+      secondBg.style.display = 'none';
     }
   }
 });
