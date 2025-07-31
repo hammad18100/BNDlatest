@@ -1778,7 +1778,11 @@ body.products-page, .products-page main {
 
   /* Remove placeholder element since we're using absolute positioning */
   
-  /* Mobile navigation is hidden by default, only shown on mobile */
+  /* Mobile navigation and cart are hidden by default, only shown on mobile */
+.mobile-nav-toggle,
+.mobile-cart-container {
+  display: none;
+}
   
   /* Ensure no navigation elements show on mobile */
   .main-header nav {
@@ -1799,9 +1803,55 @@ body.products-page, .products-page main {
   
   /* Hide specific navigation elements on mobile */
   .main-header .desktop-nav,
-  .main-header .header-actions,
-  .main-header .cart-container {
+  .main-header .header-actions {
     display: none !important;
+  }
+
+  /* Show mobile cart */
+  .mobile-cart-container {
+    position: absolute;
+    right: 20px;
+    z-index: 1001;
+  }
+
+  .mobile-cart-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s;
+  }
+
+  .mobile-cart-icon:hover {
+    color: #aaa;
+  }
+
+  .mobile-cart-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4444;
+    color: #fff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    min-width: 18px;
   }
   
   /* Ensure only logo and hamburger are visible */
@@ -1987,6 +2037,11 @@ body.products-page, .products-page main {
     height: 100vh;
     background: rgba(0,0,0,0.95);
     z-index: 1000;
+    display: none;
+  }
+
+  .cart-dropdown.active {
+    display: block;
   }
   
   .cart-header {
@@ -2129,13 +2184,17 @@ body.products-page, .products-page main {
   }
 }
 
-/* Desktop styles - hide mobile navigation */
+/* Desktop styles - hide mobile navigation and mobile cart */
 @media (min-width: 769px) {
   .mobile-nav-toggle {
     display: none !important;
   }
   
   .mobile-nav {
+    display: none !important;
+  }
+  
+  .mobile-cart-container {
     display: none !important;
   }
 }

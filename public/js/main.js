@@ -239,6 +239,7 @@ class Cart {
 
   setupEventListeners() {
     const cartIcon = document.getElementById('cartIcon');
+    const mobileCartIcon = document.getElementById('mobileCartIcon');
     const cartDropdown = document.getElementById('cartDropdown');
     const closeCart = document.getElementById('closeCart');
     const checkoutBtn = document.getElementById('checkoutBtn');
@@ -246,6 +247,12 @@ class Cart {
 
     if (cartIcon) {
       cartIcon.addEventListener('click', () => {
+        this.toggleCart();
+      });
+    }
+
+    if (mobileCartIcon) {
+      mobileCartIcon.addEventListener('click', () => {
         this.toggleCart();
       });
     }
@@ -265,7 +272,7 @@ class Cart {
 
     // Close cart when clicking outside
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.cart-container')) {
+      if (!e.target.closest('.cart-container') && !e.target.closest('.mobile-cart-container')) {
         this.closeCart();
       }
     });
@@ -372,10 +379,18 @@ class Cart {
 
   updateCartCount() {
     const cartCount = document.getElementById('cartCount');
+    const mobileCartCount = document.getElementById('mobileCartCount');
+    
+    const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
+    
     if (cartCount) {
-      const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
       cartCount.textContent = totalItems;
       cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+    
+    if (mobileCartCount) {
+      mobileCartCount.textContent = totalItems;
+      mobileCartCount.style.display = totalItems > 0 ? 'flex' : 'none';
     }
   }
 
@@ -454,11 +469,12 @@ class Cart {
 // Initialize cart
 let cart;
 document.addEventListener('DOMContentLoaded', () => {
-  // Only initialize cart if cart elements exist
+  // Initialize cart if cart elements exist (desktop or mobile)
   const cartIcon = document.getElementById('cartIcon');
+  const mobileCartIcon = document.getElementById('mobileCartIcon');
   const cartDropdown = document.getElementById('cartDropdown');
   
-  if (cartIcon && cartDropdown) {
+  if ((cartIcon || mobileCartIcon) && cartDropdown) {
     cart = new Cart();
     
     // Ensure cart starts closed
