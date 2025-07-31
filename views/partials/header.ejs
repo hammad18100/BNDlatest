@@ -57,7 +57,9 @@
 
     <!-- Mobile Navigation Toggle -->
     <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open mobile menu" aria-controls="mobileNav" aria-expanded="false">
-      &#9776;
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
     </button>
 
     <div class="logo-container">
@@ -114,5 +116,12 @@
 
   <!-- Mobile Navigation Menu -->
   <div class="mobile-nav" id="mobileNav" role="menu" aria-label="Mobile navigation">
-    <!-- Navigation links and close button removed for clean mobile header -->
+    <nav class="mobile-nav-menu">
+      <a href="/" class="mobile-nav-link">Home</a>
+      <a href="/products" class="mobile-nav-link">Collections</a>
+      <a href="/about" class="mobile-nav-link">About Us</a>
+    </nav>
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close mobile menu">
+      &times;
+    </button>
   </div>

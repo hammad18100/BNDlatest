@@ -151,9 +151,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Close button removed - mobile nav is now completely empty
-    
-    // Mobile nav is now empty - no links to close
+    // Close mobile nav when clicking close button
+    if (mobileNavClose) {
+        mobileNavClose.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            mobileNavToggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        });
+    }
+
+    // Close mobile nav when clicking on a link
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileNav.classList.remove('active');
+            mobileNavToggle.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        });
+    });
     
     // Collections dropdown functionality
     const collectionsContainer = document.querySelector('.collections-menu-container');
@@ -699,15 +714,15 @@ function showStockInfo(stockQuantity) {
   if (stockQuantity > 10) {
     stockInfo.style.background = '#1a3a1a';
     stockInfo.style.color = '#4ade80';
-    stockInfo.textContent = `✓ In Stock (${stockQuantity} available)`;
+    stockInfo.textContent = `In Stock (${stockQuantity} available)`;
   } else if (stockQuantity > 0) {
     stockInfo.style.background = '#3a2a1a';
     stockInfo.style.color = '#fbbf24';
-    stockInfo.textContent = `⚠ Low Stock (${stockQuantity} available)`;
+    stockInfo.textContent = `Low Stock (${stockQuantity} available)`;
   } else {
     stockInfo.style.background = '#3a1a1a';
     stockInfo.style.color = '#f87171';
-    stockInfo.textContent = '✗ Out of Stock';
+    stockInfo.textContent = 'Out of Stock';
   }
   
   // Insert after quantity box
@@ -741,11 +756,11 @@ function showStockInfoWithCart(availableStock, variantId) {
   if (availableStock > 0 && availableStock < 3) {
     stockInfo.style.background = '#3a2a1a';
     stockInfo.style.color = '#fbbf24';
-    stockInfo.textContent = `⚠ Low Stock`;
+    stockInfo.textContent = `Low Stock`;
   } else if (availableStock === 0) {
     stockInfo.style.background = '#3a1a1a';
     stockInfo.style.color = '#f87171';
-    stockInfo.textContent = `✗ Out of Stock (0 available)`;
+    stockInfo.textContent = `Out of Stock (0 available)`;
   } else {
     // No message for in stock
     stockInfo.textContent = '';
