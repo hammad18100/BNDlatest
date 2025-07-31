@@ -374,11 +374,19 @@ class Cart {
   }
 
   updateQuantity(index, newQuantity) {
+    console.log('Cart updateQuantity called:', { index, newQuantity, items: this.items });
+    
     const item = this.items[index];
-    const stockQuantity = parseInt(document.querySelector(`[data-variant-id="${item.variantId}"]`).dataset.stockQuantity || 0);
+    if (!item) {
+      console.error('Item not found at index:', index);
+      return;
+    }
+    
+    const stockQuantity = parseInt(document.querySelector(`[data-variant-id="${item.variantId}"]`)?.dataset.stockQuantity || 0);
     
     // Ensure newQuantity is a valid number and only increment by 1
     if (typeof newQuantity !== 'number' || isNaN(newQuantity)) {
+      console.error('Invalid newQuantity:', newQuantity);
       return;
     }
     
@@ -394,6 +402,7 @@ class Cart {
     }
     if (newQuantity > 0) {
       this.items[index].quantity = newQuantity;
+      console.log('Quantity updated to:', newQuantity);
     } else {
       this.removeItem(index);
       return;
@@ -457,11 +466,11 @@ class Cart {
           <div class="cart-item-price">RM ${item.price.toFixed(2)}</div>
         </div>
         <div class="cart-item-quantity">
-          <button class="quantity-btn" onclick="cart.updateQuantity(${index}, ${item.quantity - 1})">-</button>
+          <button class="quantity-btn" onclick="window.cart.updateQuantity(${index}, ${item.quantity - 1})">-</button>
           <span class="quantity-display">${item.quantity}</span>
-          <button class="quantity-btn" onclick="cart.updateQuantity(${index}, ${item.quantity + 1})">+</button>
+          <button class="quantity-btn" onclick="window.cart.updateQuantity(${index}, ${item.quantity + 1})">+</button>
         </div>
-        <button class="remove-item" onclick="cart.removeItem(${index})">&times;</button>
+        <button class="remove-item" onclick="window.cart.removeItem(${index})">&times;</button>
       </div>
     `).join('');
 
@@ -523,6 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   if ((cartIcon || mobileCartIcon) && cartDropdown) {
     cart = new Cart();
+    window.cart = cart; // Ensure cart is globally available
     
     // Ensure cart starts closed
     cartDropdown.classList.remove('active');
@@ -809,14 +819,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileCartIcon = document.getElementById('mobileCartIcon');
   const cartDropdown = document.getElementById('cartDropdown');
 
-  if ((cartIcon || mobileCartIcon) && cartDropdown) {
+  // Always initialize cart if cart elements exist
+  if (cartIcon || mobileCartIcon || cartDropdown) {
     cart = new Cart();
-    // Ensure cart starts closed
-    cartDropdown.classList.remove('active');
-    cartDropdown.style.display = 'none';
-    cartDropdown.style.opacity = '0';
-    cartDropdown.style.visibility = 'hidden';
-    cartDropdown.style.pointerEvents = 'none';
+    window.cart = cart; // Ensure cart is globally available
+    
+    // Ensure cart starts closed if dropdown exists
+    if (cartDropdown) {
+      cartDropdown.classList.remove('active');
+      cartDropdown.style.display = 'none';
+      cartDropdown.style.opacity = '0';
+      cartDropdown.style.visibility = 'hidden';
+      cartDropdown.style.pointerEvents = 'none';
+    }
 
     // Force update cart count on initialization
     setTimeout(() => {

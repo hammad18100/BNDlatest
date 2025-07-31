@@ -84,6 +84,11 @@
       if (!window.cart) {
         window.cart = new Cart();
       }
+      
+      // Ensure cart is properly loaded from localStorage
+      window.cart.items = JSON.parse(localStorage.getItem('cart')) || [];
+      window.cart.updateCartCount();
+      
       renderMobileCartPage();
       
       // Show success message if redirected from product page
@@ -144,9 +149,12 @@
     }
 
     function updateCartItemQuantity(index, newQuantity) {
+      console.log('updateCartItemQuantity called:', { index, newQuantity, cart: !!window.cart });
+      
       if (window.cart) {
         // Ensure newQuantity is valid and only increment by 1
         const currentQuantity = window.cart.items[index].quantity;
+        console.log('Current quantity:', currentQuantity);
         
         // For incrementing, ensure it only goes up by 1
         if (newQuantity > currentQuantity && newQuantity > currentQuantity + 1) {
@@ -163,10 +171,13 @@
           newQuantity = 1;
         }
         
+        console.log('Final newQuantity:', newQuantity);
         window.cart.updateQuantity(index, newQuantity);
         renderMobileCartPage();
         // Update cart count in header
         window.cart.updateCartCount();
+      } else {
+        console.error('Cart not available!');
       }
     }
 
