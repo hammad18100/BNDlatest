@@ -710,16 +710,15 @@ function initializeStockValidation() {
       quantityPlus.addEventListener('click', quantityPlus._clickHandler);
     }
     
-    // Initialize with first size selected (if any)
-    const firstSizeBtn = sizeBtns[0];
-    if (firstSizeBtn) {
-      const variantId = firstSizeBtn.dataset.variantId;
-      const availableStock = getAvailableStock(variantId);
-      maxStock = availableStock;
-      // Always start with quantity 1
-      quantityInput.textContent = '1';
-      updateQuantityButtonsState(1, availableStock);
-      showStockInfoWithCart(availableStock, variantId);
+    // Initialize without selecting any size
+    // Only show stock info when a size is actually clicked
+    quantityInput.textContent = '1';
+    updateQuantityButtonsState(1, 0); // Disable buttons until size is selected
+    
+    // Clear any existing stock info
+    const existingInfo = document.querySelector('.stock-info');
+    if (existingInfo) {
+      existingInfo.remove();
     }
     
     // Add function to refresh current size stock
@@ -732,6 +731,14 @@ function initializeStockValidation() {
         const currentQty = parseInt(quantityInput.textContent) || 1;
         updateQuantityButtonsState(currentQty, availableStock);
         showStockInfoWithCart(availableStock, variantId);
+      } else {
+        // No size selected, clear stock info and disable buttons
+        maxStock = 0;
+        updateQuantityButtonsState(1, 0);
+        const existingInfo = document.querySelector('.stock-info');
+        if (existingInfo) {
+          existingInfo.remove();
+        }
       }
     };
   }
