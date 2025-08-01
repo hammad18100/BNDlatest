@@ -119,6 +119,9 @@ app.post('/api/validate-stock', async (req, res) => {
   }
   
   try {
+    const outOfStockItems = [];
+    const validItems = [];
+    
     // Check stock availability for each item in cart
     for (const item of cart) {
       const stockResult = await pool.query(
@@ -127,19 +130,37 @@ app.post('/api/validate-stock', async (req, res) => {
       );
       
       if (stockResult.rows.length === 0) {
-        return res.status(400).json({ 
-          success: false, 
-          message: `Product variant not found: ${item.variantId}` 
+        outOfStockItems.push({
+          variantId: item.variantId,
+          name: item.name,
+          size: item.size,
+          reason: 'Product variant not found'
         });
+        continue;
       }
       
       const availableStock = stockResult.rows[0].stock_quantity;
       if (availableStock < item.quantity) {
-        return res.status(400).json({ 
-          success: false, 
-          message: `Insufficient stock for item. Available: ${availableStock}, Requested: ${item.quantity}` 
+        outOfStockItems.push({
+          variantId: item.variantId,
+          name: item.name,
+          size: item.size,
+          reason: `Insufficient stock. Available: ${availableStock}, Requested: ${item.quantity}`
         });
+        continue;
       }
+      
+      // Item is in stock
+      validItems.push(item);
+    }
+    
+    if (outOfStockItems.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Some items in your cart are out of stock.',
+        outOfStockItems: outOfStockItems,
+        validItems: validItems
+      });
     }
     
     res.json({ success: true, message: 'Stock validation passed.' });

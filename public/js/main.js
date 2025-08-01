@@ -356,9 +356,11 @@ class Cart {
     }
     
     // Refresh stock validation on product detail pages
-    if (typeof initializeStockValidation === 'function') {
-      initializeStockValidation();
-    }
+    setTimeout(() => {
+      if (typeof initializeStockValidation === 'function') {
+        initializeStockValidation();
+      }
+    }, 300);
   }
 
   removeItem(index) {
@@ -594,7 +596,7 @@ function addToCart(productData) {
     } else if (typeof initializeStockValidation === 'function') {
       initializeStockValidation();
     }
-  }, 100);
+  }, 300);
 }
 
 // Buy Now function for product pages

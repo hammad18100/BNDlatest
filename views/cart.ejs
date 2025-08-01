@@ -110,6 +110,9 @@
         showCartSuccessMessage();
       }
       
+      // Validate stock and remove out-of-stock items
+      validateAndCleanCart();
+      
       // Test cart functionality
       console.log('Cart instance available:', !!window.cart);
       console.log('Cart items count:', window.cart.items.length);
@@ -127,6 +130,70 @@
         setTimeout(() => {
           successMessage.style.display = 'none';
         }, 3000);
+      }
+    }
+
+    async function validateAndCleanCart() {
+      if (window.cart.items.length === 0) return;
+      
+      try {
+        const response = await fetch('/api/validate-stock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cart: window.cart.items })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success && data.outOfStockItems && data.outOfStockItems.length > 0) {
+          // Remove out-of-stock items from cart
+          const updatedItems = window.cart.items.filter(item => 
+            !data.outOfStockItems.some(outOfStock => 
+              outOfStock.variantId === item.variantId
+            )
+          );
+          
+          // Update cart with cleaned items
+          window.cart.items = updatedItems;
+          window.cart.saveCart();
+          window.cart.updateCartCount();
+          
+          // Re-render the cart page
+          renderMobileCartPage();
+          
+          // Show notification about removed items
+          const outOfStockNames = data.outOfStockItems.map(item => 
+            `${item.name} (${item.size})`
+          ).join(', ');
+          
+          // Create a temporary notification
+          const notification = document.createElement('div');
+          notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            max-width: 90%;
+            text-align: center;
+            font-size: 14px;
+          `;
+          notification.textContent = `Removed from cart (out of stock): ${outOfStockNames}`;
+          document.body.appendChild(notification);
+          
+          // Remove notification after 5 seconds
+          setTimeout(() => {
+            if (notification.parentNode) {
+              notification.parentNode.removeChild(notification);
+            }
+          }, 5000);
+        }
+      } catch (err) {
+        console.error('Error validating cart stock:', err);
       }
     }
 

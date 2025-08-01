@@ -53,9 +53,7 @@ function renderCheckoutCart() {
       <div class='checkout-item-details'>
         <span class='checkout-item-name'>${item.name} (Size: ${item.size})</span>
         <div class='checkout-item-quantity'>
-          <button class='quantity-btn' onclick='updateCheckoutQuantity(${index}, ${item.quantity - 1})'>-</button>
-          <span class='quantity-display'>${item.quantity}</span>
-          <button class='quantity-btn' onclick='updateCheckoutQuantity(${index}, ${item.quantity + 1})'>+</button>
+          <span class='quantity-display'>Qty: ${item.quantity}</span>
           <button class='remove-item-btn' onclick='removeCheckoutItem(${index})' title='Remove item'>&times;</button>
         </div>
       </div>
@@ -91,47 +89,7 @@ function renderCheckoutCart() {
 }
 renderCheckoutCart();
 
-// Function to update quantity in checkout
-function updateCheckoutQuantity(index, newQuantity) {
-  console.log('updateCheckoutQuantity called:', { index, newQuantity });
-  
-  // Get cart from localStorage
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  
-  if (index >= 0 && index < cart.length) {
-    // Ensure newQuantity is valid and only increment by 1
-    const currentQuantity = cart[index].quantity;
-    
-    // For incrementing, ensure it only goes up by 1
-    if (newQuantity > currentQuantity && newQuantity > currentQuantity + 1) {
-      newQuantity = currentQuantity + 1;
-    }
-    
-    // For decrementing, ensure it only goes down by 1
-    if (newQuantity < currentQuantity && newQuantity < currentQuantity - 1) {
-      newQuantity = currentQuantity - 1;
-    }
-    
-    // Don't allow quantity less than 1
-    if (newQuantity < 1) {
-      newQuantity = 1;
-    }
-    
-    // Update the quantity
-    cart[index].quantity = newQuantity;
-    
-    // Save back to localStorage
-    localStorage.setItem('cart', JSON.stringify(cart));
-    
-    // Re-render the checkout cart
-    renderCheckoutCart();
-    
-    // Update cart count in header if cart elements exist
-    updateCartCountInHeader();
-    
-    console.log('Quantity updated to:', newQuantity);
-  }
-}
+
 
 // Function to remove item from checkout
 function removeCheckoutItem(index) {
@@ -231,8 +189,35 @@ checkoutForm.addEventListener('submit', async function(e) {
     const stockValidationData = await stockValidationResponse.json();
     
     if (!stockValidationData.success) {
-      errorDiv.textContent = stockValidationData.message || 'Some items in your cart are no longer available. Please update your cart.';
-      return;
+      // Handle out-of-stock items
+      if (stockValidationData.outOfStockItems && stockValidationData.outOfStockItems.length > 0) {
+        // Remove out-of-stock items from cart
+        const updatedCart = cart.filter(item => 
+          !stockValidationData.outOfStockItems.some(outOfStock => 
+            outOfStock.variantId === item.variantId
+          )
+        );
+        
+        // Update localStorage with the cleaned cart
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
+        
+        // Update cart count in header
+        updateCartCountInHeader();
+        
+        // Re-render the checkout cart
+        renderCheckoutCart();
+        
+        // Show error message with details
+        const outOfStockNames = stockValidationData.outOfStockItems.map(item => 
+          `${item.name} (${item.size})`
+        ).join(', ');
+        
+        errorDiv.textContent = `The following items have been removed from your cart as they are out of stock: ${outOfStockNames}. Please review your cart and try again.`;
+        return;
+      } else {
+        errorDiv.textContent = stockValidationData.message || 'Some items in your cart are no longer available. Please update your cart.';
+        return;
+      }
     }
   } catch (err) {
     console.error('Stock validation error:', err);
