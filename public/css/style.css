@@ -377,7 +377,7 @@ main {
   left: 50%;
   transform: translateX(-10.5%);
   width: 1240px;
-  height: 580px;
+  height: 850px;
   background: rgba(47, 45, 45, 0.95);
   display: none;
   justify-content: center;
@@ -399,8 +399,8 @@ main {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(4, 280px);
-  gap: 40px;
-  padding: 40px;
+  gap: 50px;
+  padding: 50px;
   justify-content: center;
 }
 
@@ -416,7 +416,7 @@ main {
   justify-content: space-between;
   align-items: center;
   width: 280px;
-  height: 480px;
+  height: 420px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.07);
   padding: 20px;
