@@ -541,11 +541,12 @@ app.post('/checkout', async (req, res) => {
 app.post('/toyyibpay-callback', async (req, res) => {
   try {
     console.log('ToyyibPay callback received - Full body:', req.body);
+    console.log('ToyyibPay callback received - Full query:', req.query);
     
     // ToyyibPay might send different field names, so we need to handle various possibilities
-    let order_id = req.body.order_id || req.body.orderId || req.body.referenceNo;
-    const status = req.body.status;
-    const billcode = req.body.billcode || req.body.billCode;
+    let order_id = req.body.order_id || req.body.orderId || req.body.referenceNo || req.query.order_id;
+    const status = req.body.status || req.query.status_id || req.query.status;
+    const billcode = req.body.billcode || req.body.billCode || req.query.billcode;
     
     // If order_id is the external reference number (BND-{orderId}-{timestamp}), extract the orderId
     if (order_id && order_id.startsWith('BND-')) {
@@ -630,15 +631,20 @@ app.post('/toyyibpay-callback', async (req, res) => {
 // ToyyibPay Return URL Handler - When user returns from payment
 app.get('/thank-you/:orderId', async (req, res) => {
   const { orderId } = req.params;
-  const { status } = req.query; // ToyyibPay will add status parameter
+  const { status_id, status, order_id, billcode, msg } = req.query; // ToyyibPay parameters
   
-  console.log(`Thank you page accessed for order ${orderId} with status: ${status}`);
+  console.log(`Thank you page accessed for order ${orderId}`);
   console.log(`Full query parameters:`, req.query);
   
+  // Use status_id if available, otherwise fall back to status
+  const paymentStatus = status_id || status;
+  
+  console.log(`Payment status determined: ${paymentStatus}`);
+  
   // ToyyibPay Status Codes:
-  // status = '1' -> Payment successful
-  // status = '0' -> Payment failed
-  // status = '2' -> Payment pending
+  // status_id/status = '1' -> Payment successful
+  // status_id/status = '0' -> Payment failed
+  // status_id/status = '2' -> Payment pending
   // no status -> User returned without completing payment
   
   try {
@@ -655,7 +661,7 @@ app.get('/thank-you/:orderId', async (req, res) => {
     const order = orderResult.rows[0];
     
     // If payment was successful (status=1) but order is still pending, update it
-    if (status === '1' && order.status === 'pending') {
+    if (paymentStatus === '1' && order.status === 'pending') {
       const client = await pool.connect();
       try {
         await client.query('BEGIN');
@@ -733,25 +739,25 @@ app.get('/thank-you/:orderId', async (req, res) => {
     }
     
     // Handle failed payments - ALWAYS redirect for failed status
-    if (status === '0' || status === '2') {
-      console.log(`Order ${orderId} payment failed with status ${status}, redirecting to products page`);
+    if (paymentStatus === '0' || paymentStatus === '2') {
+      console.log(`Order ${orderId} payment failed with status ${paymentStatus}, redirecting to products page`);
       return res.redirect('/products?message=Payment failed. Please try again.');
     }
     
     // Handle pending payments
-    if (status === '2') {
+    if (paymentStatus === '2') {
       console.log(`Order ${orderId} payment is pending, redirecting to products page`);
       return res.redirect('/products?message=Payment is pending. Please check your payment status.');
     }
     
     // If status is not '1' (success), redirect to products page
-    if (status && status !== '1') {
-      console.log(`Order ${orderId} has non-success status ${status}, redirecting to products page`);
+    if (paymentStatus && paymentStatus !== '1') {
+      console.log(`Order ${orderId} has non-success status ${paymentStatus}, redirecting to products page`);
       return res.redirect('/products?message=Payment was not successful. Please try again.');
     }
     
     // If no status parameter is provided, check the order status in database
-    if (!status) {
+    if (!paymentStatus) {
       console.log(`No status parameter provided for order ${orderId}, checking database status`);
       if (order.status !== 'paid') {
         console.log(`Order ${orderId} status in database is ${order.status}, redirecting to products page`);
@@ -817,6 +823,96 @@ app.get('/thank-you/:orderId', async (req, res) => {
   } catch (err) {
     console.error('Error loading thank you page:', err);
     res.status(500).send('Error loading order details');
+  }
+});
+
+// ToyyibPay Callback Endpoint - Handle payment confirmation (GET method)
+app.get('/toyyibpay-callback', async (req, res) => {
+  try {
+    console.log('ToyyibPay GET callback received - Full query:', req.query);
+    
+    // ToyyibPay might send different field names, so we need to handle various possibilities
+    let order_id = req.query.order_id || req.query.orderId || req.query.referenceNo;
+    const status = req.query.status_id || req.query.status;
+    const billcode = req.query.billcode || req.query.billCode;
+    
+    // If order_id is the external reference number (BND-{orderId}-{timestamp}), extract the orderId
+    if (order_id && order_id.startsWith('BND-')) {
+      const parts = order_id.split('-');
+      if (parts.length >= 2) {
+        order_id = parts[1]; // Extract the orderId part
+      }
+    }
+    
+    console.log('ToyyibPay GET callback parsed:', { order_id, status, billcode });
+    
+    if (!order_id) {
+      console.error('No order_id found in GET callback:', req.query);
+      return res.status(400).json({ success: false, message: 'No order_id provided' });
+    }
+    
+    if (status === '1') { // Payment successful
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        
+        // Check if order is still pending
+        const orderCheck = await client.query(
+          'SELECT status FROM orders WHERE order_id = $1 FOR UPDATE',
+          [order_id]
+        );
+        
+        if (orderCheck.rows.length === 0) {
+          throw new Error('Order not found');
+        }
+        
+        if (orderCheck.rows[0].status === 'paid') {
+          console.log(`Order ${order_id} already marked as paid`);
+          await client.query('COMMIT');
+          return res.json({ success: true, message: 'Order already processed' });
+        }
+        
+        // Update order status to paid
+        await client.query(
+          'UPDATE orders SET status = $1, payment_date = NOW() WHERE order_id = $2',
+          ['paid', order_id]
+        );
+        
+        // Get order items for stock update
+        const orderItems = await client.query(
+          'SELECT variant_id, quantity FROM order_items WHERE order_id = $1',
+          [order_id]
+        );
+        
+        // Update stock for each item
+        for (const item of orderItems.rows) {
+          await client.query(
+            'UPDATE product_variants SET stock_quantity = stock_quantity - $1 WHERE variant_id = $2',
+            [item.quantity, item.variant_id]
+          );
+        }
+        
+        await client.query('COMMIT');
+        res.json({ success: true, message: 'Payment processed successfully' });
+      } catch (err) {
+        await client.query('ROLLBACK');
+        console.error('Error processing payment:', err);
+        res.status(500).json({ success: false, message: 'Error processing payment' });
+      } finally {
+        client.release();
+      }
+    } else {
+      // Payment failed or pending
+      await pool.query(
+        'UPDATE orders SET status = $1 WHERE order_id = $2',
+        [status === '2' ? 'pending' : 'failed', order_id]
+      );
+      console.log(`Order ${order_id} payment status: ${status}`);
+      res.json({ success: true, message: 'Payment status updated' });
+    }
+  } catch (err) {
+    console.error('ToyyibPay GET callback error:', err);
+    res.status(500).json({ success: false, message: 'Callback error' });
   }
 });
 
