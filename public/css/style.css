@@ -375,11 +375,9 @@ main {
   position: absolute;
   top: 40px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 95vw;
-  max-width: 1500px;
-  height: 80vh;
-  max-height: 580px;
+  transform: translateX(-10.5%);
+  width: 1500px;
+  height: 580px;
   background: rgba(47, 45, 45, 0.95);
   display: none;
   justify-content: center;
@@ -400,11 +398,10 @@ main {
   width: 95%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 280px));
-  gap: 20px;
-  padding: 20px;
+  grid-template-columns: repeat(4, 280px);
+  gap: 40px;
+  padding: 40px;
   justify-content: center;
-  align-items: center;
 }
 
 .collection-box {
@@ -418,13 +415,11 @@ main {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  max-width: 280px;
-  height: 400px;
-  max-height: 480px;
+  width: 280px;
+  height: 480px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.07);
-  padding: 15px;
+  padding: 20px;
 }
 
 .collection-box:hover {
@@ -443,10 +438,9 @@ main {
 
 .collection-box img {
   width: 100%;
-  height: 320px;
-  max-height: 400px;
+  height: 400px;
   object-fit: cover;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .collection-title {
@@ -1795,29 +1789,7 @@ html {
   }
   
   .collections-dropdown {
-    width: 98vw !important;
-    height: 70vh !important;
-    max-height: 500px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-  
-  .collections-panel {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 250px)) !important;
-    gap: 15px !important;
-    padding: 15px !important;
-  }
-  
-  .collection-box {
-    height: 350px !important;
-    max-height: 400px !important;
-    padding: 10px !important;
-  }
-  
-  .collection-box img {
-    height: 280px !important;
-    max-height: 320px !important;
-    margin-bottom: 10px !important;
+    display: none !important;
   }
   
   /* Hide header actions on mobile by default */
