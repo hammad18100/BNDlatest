@@ -452,7 +452,7 @@ app.post('/api/orders', async (req, res) => {
 // ToyyibPay Checkout Endpoints
 app.post('/checkout', async (req, res) => {
   try {
-    const { cart, customer, orderId } = req.body;
+    const { cart, customer, orderId, shippingCost, processingFee } = req.body;
     if (!cart || !Array.isArray(cart) || cart.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart is empty.' });
     }
@@ -497,14 +497,9 @@ app.post('/checkout', async (req, res) => {
       client.release();
     }
 
-    // Define Subang postcodes
-    const SUBANG_POSTCODES = ["47500", "47600", "47610", "47620", "47630", "47650"];
-    const SHIPPING_COST = 7;
-
-    // Calculate subtotal and shipping cost
+    // Calculate subtotal using passed fees
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingCost = SUBANG_POSTCODES.includes(customer.postcode) ? 0 : SHIPPING_COST;
-    const total = subtotal + shippingCost;
+    const total = subtotal + (shippingCost || 0) + (processingFee || 0);
     // Prepare bill description
     const description = cart.map(item => `Variant ${item.variant_id} (x${item.quantity})`).join(', ');
     // Prepare ToyyibPay bill data

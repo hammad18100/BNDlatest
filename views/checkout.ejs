@@ -238,6 +238,10 @@ checkoutForm.addEventListener('submit', async function(e) {
       price: item.price
     }));
     
+    // Calculate shipping and processing fees
+    const shippingCost = SUBANG_POSTCODES.includes(postcode) ? 0 : SHIPPING_COST;
+    const processingFee = 3;
+    
     // First, create a pending order
     const orderResponse = await fetch('/api/create-pending-order', {
       method: 'POST',
@@ -248,7 +252,9 @@ checkoutForm.addEventListener('submit', async function(e) {
         phone: phone,
         address: address,
         postcode: postcode,
-        cart: transformedCart
+        cart: transformedCart,
+        shippingCost: shippingCost,
+        processingFee: processingFee
       })
     });
     
@@ -262,7 +268,9 @@ checkoutForm.addEventListener('submit', async function(e) {
         body: JSON.stringify({
           cart: transformedCart,
           customer: { name, email, phone, address, postcode },
-          orderId: orderData.orderId
+          orderId: orderData.orderId,
+          shippingCost: shippingCost,
+          processingFee: processingFee
         })
       });
       
