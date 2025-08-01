@@ -111,6 +111,44 @@ app.get('/checkout', (req, res) => {
 
 
 
+// API Route for Stock Validation (before checkout)
+app.post('/api/validate-stock', async (req, res) => {
+  const { cart } = req.body;
+  if (!cart || !Array.isArray(cart) || cart.length === 0) {
+    return res.status(400).json({ success: false, message: 'Invalid cart data.' });
+  }
+  
+  try {
+    // Check stock availability for each item in cart
+    for (const item of cart) {
+      const stockResult = await pool.query(
+        'SELECT stock_quantity FROM product_variants WHERE variant_id = $1',
+        [item.variantId]
+      );
+      
+      if (stockResult.rows.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Product variant not found: ${item.variantId}` 
+        });
+      }
+      
+      const availableStock = stockResult.rows[0].stock_quantity;
+      if (availableStock < item.quantity) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Insufficient stock for item. Available: ${availableStock}, Requested: ${item.quantity}` 
+        });
+      }
+    }
+    
+    res.json({ success: true, message: 'Stock validation passed.' });
+  } catch (err) {
+    console.error('Error validating stock:', err);
+    res.status(500).json({ success: false, message: 'Failed to validate stock.' });
+  }
+});
+
 // API Route for Creating Pending Order (before payment)
 app.post('/api/create-pending-order', async (req, res) => {
   const { email, name, phone, address, postcode, cart } = req.body;

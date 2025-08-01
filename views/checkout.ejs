@@ -46,12 +46,20 @@ function renderCheckoutCart() {
     return;
   }
   let subtotal = 0;
-  let cartHtml = cart.map(item => {
+  let cartHtml = cart.map((item, index) => {
     const itemTotal = item.price * item.quantity;
     subtotal += itemTotal;
     return `<div class='checkout-cart-item'>
-      <span>${item.name} (Size: ${item.size}) x${item.quantity}</span>
-      <span>RM ${itemTotal.toFixed(2)}</span>
+      <div class='checkout-item-details'>
+        <span class='checkout-item-name'>${item.name} (Size: ${item.size})</span>
+        <div class='checkout-item-quantity'>
+          <button class='quantity-btn' onclick='updateCheckoutQuantity(${index}, ${item.quantity - 1})'>-</button>
+          <span class='quantity-display'>${item.quantity}</span>
+          <button class='quantity-btn' onclick='updateCheckoutQuantity(${index}, ${item.quantity + 1})'>+</button>
+          <button class='remove-item-btn' onclick='removeCheckoutItem(${index})' title='Remove item'>&times;</button>
+        </div>
+      </div>
+      <span class='checkout-item-price'>RM ${itemTotal.toFixed(2)}</span>
     </div>`;
   }).join('');
 
@@ -83,6 +91,92 @@ function renderCheckoutCart() {
 }
 renderCheckoutCart();
 
+// Function to update quantity in checkout
+function updateCheckoutQuantity(index, newQuantity) {
+  console.log('updateCheckoutQuantity called:', { index, newQuantity });
+  
+  // Get cart from localStorage
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  
+  if (index >= 0 && index < cart.length) {
+    // Ensure newQuantity is valid and only increment by 1
+    const currentQuantity = cart[index].quantity;
+    
+    // For incrementing, ensure it only goes up by 1
+    if (newQuantity > currentQuantity && newQuantity > currentQuantity + 1) {
+      newQuantity = currentQuantity + 1;
+    }
+    
+    // For decrementing, ensure it only goes down by 1
+    if (newQuantity < currentQuantity && newQuantity < currentQuantity - 1) {
+      newQuantity = currentQuantity - 1;
+    }
+    
+    // Don't allow quantity less than 1
+    if (newQuantity < 1) {
+      newQuantity = 1;
+    }
+    
+    // Update the quantity
+    cart[index].quantity = newQuantity;
+    
+    // Save back to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Re-render the checkout cart
+    renderCheckoutCart();
+    
+    // Update cart count in header if cart elements exist
+    updateCartCountInHeader();
+    
+    console.log('Quantity updated to:', newQuantity);
+  }
+}
+
+// Function to remove item from checkout
+function removeCheckoutItem(index) {
+  console.log('removeCheckoutItem called:', index);
+  
+  // Get cart from localStorage
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  
+  if (index >= 0 && index < cart.length) {
+    // Remove the item
+    cart.splice(index, 1);
+    
+    // Save back to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Re-render the checkout cart
+    renderCheckoutCart();
+    
+    // Update cart count in header
+    updateCartCountInHeader();
+    
+    console.log('Item removed from cart');
+  }
+}
+
+// Function to update cart count in header
+function updateCartCountInHeader() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  
+  // Update desktop cart count
+  const cartCount = document.getElementById('cartCount');
+  if (cartCount) {
+    cartCount.textContent = totalItems;
+    cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+  }
+  
+  // Update mobile cart count
+  const mobileCartCount = document.getElementById('mobileCartCount');
+  if (mobileCartCount) {
+    mobileCartCount.textContent = totalItems;
+    mobileCartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+  }
+}
+
 // Handle form submit
 // Define Subang postcodes
 const SUBANG_POSTCODES = ["47500", "47600", "47610", "47620", "47630", "47650"];
@@ -112,6 +206,7 @@ checkoutForm.addEventListener('submit', async function(e) {
   const cart = JSON.parse(localStorage.getItem('cart') || '[]');
   const errorDiv = document.getElementById('checkoutError');
   errorDiv.textContent = '';
+  
   if (!name || !email || !phone || !address || !postcode) {
     errorDiv.textContent = 'Please fill in all fields.';
     return;
@@ -122,6 +217,26 @@ checkoutForm.addEventListener('submit', async function(e) {
   }
   if (postcode.length !== 5 || !/^\d{5}$/.test(postcode)) {
     errorDiv.textContent = 'Please enter a valid 5-digit postcode.';
+    return;
+  }
+  
+  // Final stock validation before proceeding to payment
+  try {
+    const stockValidationResponse = await fetch('/api/validate-stock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart: cart })
+    });
+    
+    const stockValidationData = await stockValidationResponse.json();
+    
+    if (!stockValidationData.success) {
+      errorDiv.textContent = stockValidationData.message || 'Some items in your cart are no longer available. Please update your cart.';
+      return;
+    }
+  } catch (err) {
+    console.error('Stock validation error:', err);
+    errorDiv.textContent = 'Unable to validate stock. Please try again.';
     return;
   }
   try {
@@ -237,9 +352,84 @@ checkoutForm.addEventListener('submit', async function(e) {
 .checkout-cart-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   color: #e0e0e0;
   font-size: 1rem;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  padding: 8px 0;
+}
+
+.checkout-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.checkout-item-name {
+  font-weight: 500;
+}
+
+.checkout-item-quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkout-item-quantity .quantity-btn {
+  background: #333;
+  color: #fff;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.checkout-item-quantity .quantity-btn:hover {
+  background: #555;
+}
+
+.checkout-item-quantity .quantity-btn:disabled {
+  background: #222;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.checkout-item-quantity .quantity-display {
+  min-width: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.checkout-item-price {
+  font-weight: 600;
+  color: #fff;
+}
+
+.remove-item-btn {
+  background: #ff4444;
+  color: #fff;
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  margin-left: 8px;
+}
+
+.remove-item-btn:hover {
+  background: #ff6666;
 }
 .checkout-cart-item.subtotal,
 .checkout-cart-item.shipping {
@@ -274,5 +464,32 @@ checkoutForm.addEventListener('submit', async function(e) {
 }
 .checkout-btn:hover {
   background: #f0f0f0;
+}
+
+/* Mobile-specific styles for checkout quantity controls */
+@media (max-width: 768px) {
+  .checkout-item-quantity {
+    gap: 6px;
+  }
+  
+  .checkout-item-quantity .quantity-btn,
+  .remove-item-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+  
+  .checkout-item-quantity .quantity-display {
+    min-width: 24px;
+    font-size: 14px;
+  }
+  
+  .checkout-cart-item {
+    padding: 12px 0;
+  }
+  
+  .checkout-item-details {
+    gap: 10px;
+  }
 }
 </style> 

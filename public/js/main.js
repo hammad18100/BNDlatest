@@ -585,8 +585,16 @@ function addToCart(productData) {
   if (quantityInput) {
     quantityInput.textContent = '1';
     console.log('Reset quantity to 1 after adding to cart');
-    updateQuantityButtonsState(1, stockQuantity - (cartQty + quantity));
   }
+  
+  // Refresh stock validation to update available stock
+  setTimeout(() => {
+    if (typeof window.refreshCurrentSizeStock === 'function') {
+      window.refreshCurrentSizeStock();
+    } else if (typeof initializeStockValidation === 'function') {
+      initializeStockValidation();
+    }
+  }, 100);
 }
 
 // Buy Now function for product pages
@@ -711,6 +719,19 @@ function initializeStockValidation() {
       updateQuantityButtonsState(1, availableStock);
       showStockInfoWithCart(availableStock, variantId);
     }
+    
+    // Add function to refresh current size stock
+    window.refreshCurrentSizeStock = function() {
+      const activeSizeBtn = document.querySelector('.size-btn.active');
+      if (activeSizeBtn) {
+        const variantId = activeSizeBtn.dataset.variantId;
+        const availableStock = getAvailableStock(variantId);
+        maxStock = availableStock;
+        const currentQty = parseInt(quantityInput.textContent) || 1;
+        updateQuantityButtonsState(currentQty, availableStock);
+        showStockInfoWithCart(availableStock, variantId);
+      }
+    };
   }
 }
 
