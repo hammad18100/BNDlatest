@@ -199,27 +199,27 @@ app.post('/api/create-pending-order', async (req, res) => {
     
     // 1. Get or create user (don't update existing user info on conflict)
     // This ensures each order maintains its own user information without overwriting previous orders
-    let userResult;
-    try {
-      // Try to insert new user
+    
+    // First, check if user already exists
+    let userResult = await client.query(
+      'SELECT user_id FROM users WHERE email = $1',
+      [email]
+    );
+    
+    let userId;
+    if (userResult.rows.length > 0) {
+      // User exists, use existing user
+      userId = userResult.rows[0].user_id;
+    } else {
+      // User doesn't exist, create new user
       userResult = await client.query(
         `INSERT INTO users (name, email, phone, address, postcode)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING user_id`,
         [name || 'New User', email, phone || '', address || '', postcode || '']
       );
-    } catch (err) {
-      // If email already exists, get the existing user
-      if (err.code === '23505') { // Unique violation error code
-        userResult = await client.query(
-          'SELECT user_id FROM users WHERE email = $1',
-          [email]
-        );
-      } else {
-        throw err;
-      }
+      userId = userResult.rows[0].user_id;
     }
-    const userId = userResult.rows[0].user_id;
     
     // 2. Calculate total
     let totalAmount = 0;
@@ -395,27 +395,28 @@ app.post('/api/orders', async (req, res) => {
   try {
     await client.query('BEGIN');
     // 1. Get or create user (don't update existing user info on conflict)
-    let userResult;
-    try {
-      // Try to insert new user
+    // This ensures each order maintains its own user information without overwriting previous orders
+    
+    // First, check if user already exists
+    let userResult = await client.query(
+      'SELECT user_id FROM users WHERE email = $1',
+      [email]
+    );
+    
+    let userId;
+    if (userResult.rows.length > 0) {
+      // User exists, use existing user
+      userId = userResult.rows[0].user_id;
+    } else {
+      // User doesn't exist, create new user
       userResult = await client.query(
         `INSERT INTO users (name, email, phone, address, postcode)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING user_id`,
         [name || 'New User', email, phone || '', address || '', postcode || '']
       );
-    } catch (err) {
-      // If email already exists, get the existing user
-      if (err.code === '23505') { // Unique violation error code
-        userResult = await client.query(
-          'SELECT user_id FROM users WHERE email = $1',
-          [email]
-        );
-      } else {
-        throw err;
-      }
+      userId = userResult.rows[0].user_id;
     }
-    const userId = userResult.rows[0].user_id;
 
     // 2. Calculate total
     let totalAmount = 0;
