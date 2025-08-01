@@ -170,57 +170,57 @@ app.post('/api/validate-stock', async (req, res) => {
   }
 });
 
-// API Route for Creating Pending Order (before payment)
 app.post('/api/create-pending-order', async (req, res) => {
   const { email, name, phone, address, postcode, cart } = req.body;
   if (!cart || !Array.isArray(cart) || cart.length === 0 || !email) {
     return res.status(400).json({ success: false, message: 'Missing required order information.' });
   }
+  
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // First, verify stock availability
-    for (const item of cart) {
-      const stockResult = await client.query(
-        'SELECT stock_quantity FROM product_variants WHERE variant_id = $1 FOR UPDATE',
-        [item.variant_id]
-      );
-      
-      if (stockResult.rows.length === 0) {
-        throw new Error(`Product variant not found: ${item.variant_id}`);
-      }
-      
-      const availableStock = stockResult.rows[0].stock_quantity;
-      if (availableStock < item.quantity) {
-        throw new Error(`Insufficient stock for item. Available: ${availableStock}, Requested: ${item.quantity}`);
-      }
-    }
-    
-    // 1. Always create a new user for each order
-    // This ensures each order has its own separate user record, even if email already exists
-    // Note: The email field in the users table should NOT have a UNIQUE constraint
-    const userResult = await client.query(
-      `INSERT INTO users (name, email, phone, address, postcode)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING user_id`,
-      [name || 'New User', email, phone || '', address || '', postcode || '']
+    // 1. Check if user exists, if not create one
+    let userId;
+    const userCheck = await client.query(
+      'SELECT user_id FROM users WHERE email = $1',
+      [email]
     );
-    const userId = userResult.rows[0].user_id;
-    
+
+    if (userCheck.rows.length > 0) {
+      // User exists - use existing ID
+      userId = userCheck.rows[0].user_id;
+      
+      // Optionally update user details if needed
+      await client.query(
+        'UPDATE users SET name = $1, phone = $2, address = $3, postcode = $4 WHERE user_id = $5',
+        [name || 'New User', phone || '', address || '', postcode || '', userId]
+      );
+    } else {
+      // User doesn't exist - create new
+      const userResult = await client.query(
+        `INSERT INTO users (name, email, phone, address, postcode)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING user_id`,
+        [name || 'New User', email, phone || '', address || '', postcode || '']
+      );
+      userId = userResult.rows[0].user_id;
+    }
+
+    // Rest of your existing code remains the same...
     // 2. Calculate total
     let totalAmount = 0;
     for (const item of cart) {
       totalAmount += item.price * item.quantity;
     }
-    
+
     // 3. Insert order with 'pending' status (no stock deduction yet)
     const orderResult = await client.query(
       'INSERT INTO orders (customer_id, order_date, status, total_amount) VALUES ($1, NOW(), $2, $3) RETURNING order_id',
       [userId, 'pending', totalAmount]
     );
     const orderId = orderResult.rows[0].order_id;
-    
+
     // 4. For each item: check stock with FOR UPDATE lock and insert order_item
     for (const item of cart) {
       // a. Check stock availability with row lock to prevent race conditions
