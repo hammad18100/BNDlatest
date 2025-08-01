@@ -377,7 +377,7 @@ main {
   left: 50%;
   transform: translateX(-10.5%);
   width: 1240px;
-  height: 480px;
+  height: 580px;
   background: rgba(47, 45, 45, 0.95);
   display: none;
   justify-content: center;
@@ -399,8 +399,8 @@ main {
   height: 100%;
   display: grid;
   grid-template-columns: repeat(4, 280px);
-  gap: 20px;
-  padding: 20px;
+  gap: 40px;
+  padding: 40px;
   justify-content: center;
 }
 
@@ -416,9 +416,10 @@ main {
   justify-content: space-between;
   align-items: center;
   width: 280px;
-  height: 420px;
+  height: 480px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.07);
+  padding: 20px;
 }
 
 .collection-box:hover {
@@ -437,9 +438,9 @@ main {
 
 .collection-box img {
   width: 100%;
-  height: 420px;
+  height: 400px;
   object-fit: cover;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .collection-title {
@@ -447,12 +448,13 @@ main {
   font-size: 1.2rem;
   font-weight: 600;
   color: #fff;
+  margin-bottom: 8px;
 }
 
 .collection-volume {
   font-size: 0.9rem;
   color: #ccc;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 body {
