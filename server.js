@@ -197,29 +197,16 @@ app.post('/api/create-pending-order', async (req, res) => {
       }
     }
     
-    // 1. Get or create user (don't update existing user info on conflict)
-    // This ensures each order maintains its own user information without overwriting previous orders
-    
-    // First, check if user already exists
-    let userResult = await client.query(
-      'SELECT user_id FROM users WHERE email = $1',
-      [email]
+    // 1. Always create a new user for each order
+    // This ensures each order has its own separate user record, even if email already exists
+    // Note: The email field in the users table should NOT have a UNIQUE constraint
+    const userResult = await client.query(
+      `INSERT INTO users (name, email, phone, address, postcode)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING user_id`,
+      [name || 'New User', email, phone || '', address || '', postcode || '']
     );
-    
-    let userId;
-    if (userResult.rows.length > 0) {
-      // User exists, use existing user
-      userId = userResult.rows[0].user_id;
-    } else {
-      // User doesn't exist, create new user
-      userResult = await client.query(
-        `INSERT INTO users (name, email, phone, address, postcode)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING user_id`,
-        [name || 'New User', email, phone || '', address || '', postcode || '']
-      );
-      userId = userResult.rows[0].user_id;
-    }
+    const userId = userResult.rows[0].user_id;
     
     // 2. Calculate total
     let totalAmount = 0;
@@ -394,29 +381,15 @@ app.post('/api/orders', async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // 1. Get or create user (don't update existing user info on conflict)
-    // This ensures each order maintains its own user information without overwriting previous orders
-    
-    // First, check if user already exists
-    let userResult = await client.query(
-      'SELECT user_id FROM users WHERE email = $1',
-      [email]
+    // 1. Always create a new user for each order
+    // This ensures each order has its own separate user record, even if email already exists
+    const userResult = await client.query(
+      `INSERT INTO users (name, email, phone, address, postcode)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING user_id`,
+      [name || 'New User', email, phone || '', address || '', postcode || '']
     );
-    
-    let userId;
-    if (userResult.rows.length > 0) {
-      // User exists, use existing user
-      userId = userResult.rows[0].user_id;
-    } else {
-      // User doesn't exist, create new user
-      userResult = await client.query(
-        `INSERT INTO users (name, email, phone, address, postcode)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING user_id`,
-        [name || 'New User', email, phone || '', address || '', postcode || '']
-      );
-      userId = userResult.rows[0].user_id;
-    }
+    const userId = userResult.rows[0].user_id;
 
     // 2. Calculate total
     let totalAmount = 0;
