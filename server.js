@@ -197,18 +197,28 @@ app.post('/api/create-pending-order', async (req, res) => {
       }
     }
     
-    // 1. Upsert user
-    const userResult = await client.query(
-      `INSERT INTO users (name, email, phone, address, postcode)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT (email) DO UPDATE SET 
-       name=EXCLUDED.name, 
-       phone=EXCLUDED.phone, 
-       address=EXCLUDED.address,
-       postcode=EXCLUDED.postcode
-       RETURNING user_id`,
-      [name || 'New User', email, phone || '', address || '', postcode || '']
-    );
+    // 1. Get or create user (don't update existing user info on conflict)
+    // This ensures each order maintains its own user information without overwriting previous orders
+    let userResult;
+    try {
+      // Try to insert new user
+      userResult = await client.query(
+        `INSERT INTO users (name, email, phone, address, postcode)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING user_id`,
+        [name || 'New User', email, phone || '', address || '', postcode || '']
+      );
+    } catch (err) {
+      // If email already exists, get the existing user
+      if (err.code === '23505') { // Unique violation error code
+        userResult = await client.query(
+          'SELECT user_id FROM users WHERE email = $1',
+          [email]
+        );
+      } else {
+        throw err;
+      }
+    }
     const userId = userResult.rows[0].user_id;
     
     // 2. Calculate total
@@ -384,18 +394,27 @@ app.post('/api/orders', async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    // 1. Upsert user
-    const userResult = await client.query(
-      `INSERT INTO users (name, email, phone, address, postcode)
-       VALUES ($1, $2, $3, $4, $5)
-       ON CONFLICT (email) DO UPDATE SET 
-       name=EXCLUDED.name, 
-       phone=EXCLUDED.phone, 
-       address=EXCLUDED.address,
-       postcode=EXCLUDED.postcode
-       RETURNING user_id`,
-      [name || 'New User', email, phone || '', address || '', postcode || '']
-    );
+    // 1. Get or create user (don't update existing user info on conflict)
+    let userResult;
+    try {
+      // Try to insert new user
+      userResult = await client.query(
+        `INSERT INTO users (name, email, phone, address, postcode)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING user_id`,
+        [name || 'New User', email, phone || '', address || '', postcode || '']
+      );
+    } catch (err) {
+      // If email already exists, get the existing user
+      if (err.code === '23505') { // Unique violation error code
+        userResult = await client.query(
+          'SELECT user_id FROM users WHERE email = $1',
+          [email]
+        );
+      } else {
+        throw err;
+      }
+    }
     const userId = userResult.rows[0].user_id;
 
     // 2. Calculate total
