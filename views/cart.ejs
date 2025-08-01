@@ -59,12 +59,7 @@
       <span>Item added to cart successfully!</span>
     </div>
     
-    <!-- Debug info (remove in production) -->
-    <div id="debugInfo" style="background: #333; color: #fff; padding: 10px; margin: 10px 0; border-radius: 5px; font-size: 12px;">
-      <div>Cart Items: <span id="debugItemCount">0</span></div>
-      <div>Cart Total: <span id="debugCartTotal">RM 0.00</span></div>
-      <button onclick="testCartButtons()" style="background: #666; color: #fff; border: none; padding: 5px 10px; border-radius: 3px; margin-top: 5px;">Test Buttons</button>
-    </div>
+
 
     <div class="cart-page-content">
       <div class="cart-items-container" id="cartItemsContainer">
@@ -113,14 +108,9 @@
       // Validate stock and remove out-of-stock items
       validateAndCleanCart();
       
-      // Test cart functionality
+      // Initialize cart functionality
       console.log('Cart instance available:', !!window.cart);
       console.log('Cart items count:', window.cart.items.length);
-      console.log('Cart methods available:', {
-        updateQuantity: typeof window.cart.updateQuantity,
-        saveCart: typeof window.cart.saveCart,
-        updateCartCount: typeof window.cart.updateCartCount
-      });
     });
 
     function showCartSuccessMessage() {
@@ -241,17 +231,7 @@
       if (cartPageTotal) cartPageTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
       if (cartPageCheckoutBtn) cartPageCheckoutBtn.disabled = false;
       
-      // Update debug info
-      const debugItemCount = document.getElementById('debugItemCount');
-      const debugCartTotal = document.getElementById('debugCartTotal');
       
-      if (debugItemCount) {
-        debugItemCount.textContent = window.cart.items.length;
-      }
-      
-      if (debugCartTotal) {
-        debugCartTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
-      }
     }
 
     function updateCartItemQuantity(index, newQuantity) {
@@ -378,36 +358,7 @@
       });
     }
 
-    function testCartButtons() {
-      console.log('Testing cart buttons...');
-      console.log('Cart instance:', window.cart);
-      console.log('Cart items:', window.cart?.items);
-      
-      // Update debug info
-      const debugItemCount = document.getElementById('debugItemCount');
-      const debugCartTotal = document.getElementById('debugCartTotal');
-      
-      if (debugItemCount && window.cart) {
-        debugItemCount.textContent = window.cart.items.length;
-      }
-      
-      if (debugCartTotal && window.cart) {
-        debugCartTotal.textContent = `RM ${window.cart.getTotal().toFixed(2)}`;
-      }
-      
-      // Test if buttons exist
-      const minusButtons = document.querySelectorAll('.minus-btn');
-      const plusButtons = document.querySelectorAll('.plus-btn');
-      const removeButtons = document.querySelectorAll('.remove-item');
-      
-      console.log('Found buttons:', {
-        minus: minusButtons.length,
-        plus: plusButtons.length,
-        remove: removeButtons.length
-      });
-      
-      alert(`Found ${minusButtons.length} minus buttons, ${plusButtons.length} plus buttons, ${removeButtons.length} remove buttons`);
-    }
+
   </script>
 </body>
 </html> 
