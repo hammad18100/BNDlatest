@@ -251,6 +251,37 @@ main {
   margin-bottom: 10px;
   font-weight: bold;
 }
+
+/* Checkout form styles */
+.checkout-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkout-form input,
+.checkout-form textarea,
+.checkout-form select {
+  padding: 12px 16px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #181818;
+  color: #e0e0e0;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.checkout-form input:focus,
+.checkout-form textarea:focus,
+.checkout-form select:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.checkout-form select option {
+  background: #181818;
+  color: #e0e0e0;
+}
 .size-selector {
   display: flex;
   flex-wrap: wrap;
@@ -378,7 +409,7 @@ main {
   transform: translateX(-10.5%);
   width: 1300px;
   height: 580px;
-  background: rgba(47, 45, 45, 0.95);
+  background: rgba(47, 45, 45, 0.98);
   display: none;
   justify-content: center;
   align-items: center;
